@@ -1,0 +1,104 @@
+{
+    "resultList": [
+        {
+            "CODE": "680",
+            "CODE_VALUE": "강남구"
+        },
+        {
+            "CODE": "740",
+            "CODE_VALUE": "강동구"
+        },
+        {
+            "CODE": "305",
+            "CODE_VALUE": "강북구"
+        },
+        {
+            "CODE": "500",
+            "CODE_VALUE": "강서구"
+        },
+        {
+            "CODE": "620",
+            "CODE_VALUE": "관악구"
+        },
+        {
+            "CODE": "215",
+            "CODE_VALUE": "광진구"
+        },
+        {
+            "CODE": "530",
+            "CODE_VALUE": "구로구"
+        },
+        {
+            "CODE": "545",
+            "CODE_VALUE": "금천구"
+        },
+        {
+            "CODE": "350",
+            "CODE_VALUE": "노원구"
+        },
+        {
+            "CODE": "320",
+            "CODE_VALUE": "도봉구"
+        },
+        {
+            "CODE": "230",
+            "CODE_VALUE": "동대문구"
+        },
+        {
+            "CODE": "590",
+            "CODE_VALUE": "동작구"
+        },
+        {
+            "CODE": "440",
+            "CODE_VALUE": "마포구"
+        },
+        {
+            "CODE": "410",
+            "CODE_VALUE": "서대문구"
+        },
+        {
+            "CODE": "650",
+            "CODE_VALUE": "서초구"
+        },
+        {
+            "CODE": "200",
+            "CODE_VALUE": "성동구"
+        },
+        {
+            "CODE": "290",
+            "CODE_VALUE": "성북구"
+        },
+        {
+            "CODE": "710",
+            "CODE_VALUE": "송파구"
+        },
+        {
+            "CODE": "470",
+            "CODE_VALUE": "양천구"
+        },
+        {
+            "CODE": "560",
+            "CODE_VALUE": "영등포구"
+        },
+        {
+            "CODE": "170",
+            "CODE_VALUE": "용산구"
+        },
+        {
+            "CODE": "380",
+            "CODE_VALUE": "은평구"
+        },
+        {
+            "CODE": "110",
+            "CODE_VALUE": "종로구"
+        },
+        {
+            "CODE": "140",
+            "CODE_VALUE": "중구"
+        },
+        {
+            "CODE": "260",
+            "CODE_VALUE": "중랑구"
+        }
+    ]
+}
