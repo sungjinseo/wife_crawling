@@ -117,26 +117,26 @@ class Playground:
                                 add_item[6] = p_tag.get_text().strip()
                                 add_item[7] = '예약마감'
 
-            else:
-                add_item[1] = '평일'
-                # 평일
-                for p_tag in item.select('p'):
-                    if p_tag.select('a'):
-                        link = p_tag.select('a')[0]
-                        if '13' in p_tag.get_text().strip():
-                            add_item[4] = p_tag.get_text().strip()
-                            add_item[5] = link['href'][link['href'].find('playground/') + len('playground/'):link['href'].find('/add.do')]
-                        else:
-                            add_item[6] = p_tag.get_text().strip()
-                            add_item[7] = link['href'][link['href'].find('playground/') + len('playground/'):link['href'].find('/add.do')]
-                    else:
-                        if p_tag.get_text().strip() != '':
-                            if '13' in p_tag.get_text().strip():
-                                add_item[4] = p_tag.get_text().strip()
-                                add_item[5] = '예약마감'
-                            else:
-                                add_item[6] = '-'
-                                add_item[7] = '-'
+            # else:
+            #     add_item[1] = '평일'
+            #     # 평일
+            #     for p_tag in item.select('p'):
+            #         if p_tag.select('a'):
+            #             link = p_tag.select('a')[0]
+            #             if '13' in p_tag.get_text().strip():
+            #                 add_item[4] = p_tag.get_text().strip()
+            #                 add_item[5] = link['href'][link['href'].find('playground/') + len('playground/'):link['href'].find('/add.do')]
+            #             else:
+            #                 add_item[6] = p_tag.get_text().strip()
+            #                 add_item[7] = link['href'][link['href'].find('playground/') + len('playground/'):link['href'].find('/add.do')]
+            #         else:
+            #             if p_tag.get_text().strip() != '':
+            #                 if '13' in p_tag.get_text().strip():
+            #                     add_item[4] = p_tag.get_text().strip()
+            #                     add_item[5] = '예약마감'
+            #                 else:
+            #                     add_item[6] = '-'
+            #                     add_item[7] = '-'
             if add_item[3].isdigit() or add_item[5].isdigit() or add_item[7].isdigit():
                 table.add_row(add_item)
 
