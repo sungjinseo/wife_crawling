@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>챗봇 위젯 테스트</title>
+<style>body{font:14px system-ui,sans-serif;margin:24px;color:#1d2433}label{margin-right:12px}input,select{padding:3px}</style></head>
+<body>
+<h3>대시보드 상태 흉내 (위젯 테스트용)</h3>
+<p>
+  <label>지역 <select id="dong"><option>전체</option><option>수내동</option><option>정자동</option><option>서현동</option><option>이매동</option><option selected>야탑동</option></select></label>
+  <label>평형 <input id="pymin" size="3" value="24">~<input id="pymax" size="3" value="40"></label>
+  <label>가격 <input id="pmin" size="3" value="0">~<input id="pmax" size="3" value="15"> 억</label>
+  <label>보기 <select id="scope"><option value="filt">필터 조건</option><option value="area">평형·방만</option><option value="all">전체</option></select></label>
+</p>
+<p>오른쪽 아래 버튼으로 질문해 보세요. 질문할 때마다 위 값이 context 로 전송됩니다.</p>
+<script src="widget.js"></script>
+<script>
+  const v = (id) => document.getElementById(id).value;
+  const num = (id) => (v(id) === "" ? null : Number(v(id)));
+  const base = location.pathname.replace(/\/demo$/, "");
+  DashboardChat.mount({
+    endpoint: base + "/api/chat",
+    getContext: () => ({
+      dong: v("dong"), scope: v("scope"),
+      filter: { areaMin: num("pymin"), areaMax: num("pymax"), priceMin: num("pmin"), priceMax: num("pmax"), rooms: [] },
+    }),
+  });
+</script>
+</body></html>

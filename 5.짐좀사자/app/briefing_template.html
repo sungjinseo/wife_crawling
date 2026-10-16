@@ -1,0 +1,1996 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>분당 5개 동 브리핑 __DATE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{--ink:#1d2733;--sub:#5b6775;--line:#dde2e8;--paper:#f6f7f9;--panel:#fff;--accent:#2453c4;
+  --g1:#2453c4;--g2:#d99a00;--g3:#9aa5b1;--warn:#b5446e;
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--ink);background:var(--paper)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e6eaef;--sub:#9aa6b4;--line:#2f3a46;--paper:#11161c;--panel:#18202a}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+header{flex:0 0 auto;padding:14px 24px 10px;border-bottom:1px solid var(--line);background:var(--panel)}
+h1{margin:0;font-size:1.45rem;letter-spacing:-.01em}
+.cond{margin:4px 0 0;color:var(--sub);font-size:.82rem;line-height:1.45;max-width:110ch}
+.wrap{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:var(--mapw,49%) 9px minmax(0,1fr)}
+#map{height:100%;min-height:0}
+/* 지도·정보 영역 사이 크기 조절 손잡이 (PC) */
+.splitter{position:relative;cursor:col-resize;background:var(--paper);border-left:1px solid var(--line);border-right:1px solid var(--line);touch-action:none;z-index:5}
+.splitter::before{content:"";position:absolute;left:50%;top:50%;width:3px;height:44px;margin:-22px 0 0 -1.5px;border-radius:3px;
+  background:repeating-linear-gradient(#9aa5b1 0 3px,transparent 3px 7px);opacity:.8}
+.splitter:hover,.splitter.drag,.splitter:focus-visible{background:#e3ecfb;outline:none}
+.splitter:hover::before,.splitter.drag::before{background:repeating-linear-gradient(#2453c4 0 3px,transparent 3px 7px);opacity:1}
+.splitter .sp-tip{position:absolute;top:50%;left:14px;transform:translateY(-50%);white-space:nowrap;background:#253548;color:#fff;font-size:.72rem;
+  padding:4px 8px;border-radius:5px;opacity:0;pointer-events:none;transition:opacity .15s}
+.splitter.drag .sp-tip{opacity:1}
+body.resizing{cursor:col-resize;user-select:none}
+body.resizing #map,body.resizing .panel{pointer-events:none}
+.panel{min-height:0;min-width:0;overflow-y:auto;padding:14px 22px 48px;background:var(--panel)}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.bar .lbl{font-size:.8rem;color:var(--sub);margin-right:4px;min-width:3.5em}
+button.pill{font:inherit;font-size:.88rem;padding:5px 13px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;cursor:pointer}
+button.pill[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+button.pill:focus-visible,tr[tabindex]:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+h2{font-size:1.08rem;margin:26px 0 4px}
+.note{color:var(--sub);font-size:.82rem;margin:0 0 10px;max-width:78ch;line-height:1.5}
+.lead{font-size:.95rem;line-height:1.6;margin:14px 0 4px;padding:12px 14px;border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.chart{position:relative;height:250px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{padding:7px 7px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:500;color:var(--sub);background:var(--panel);position:sticky;top:0}
+th:first-child,td:first-child{text-align:left}
+tbody tr[tabindex]{cursor:pointer}
+tbody tr:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.chip{display:inline-block;min-width:1.6em;padding:1px 6px;border-radius:4px;color:#fff;font-size:.76rem;text-align:center}
+.g상{background:var(--g1)}.g중{background:var(--g2)}.g하{background:var(--g3)}.gnone{background:#c7cdd4}
+.pos{color:var(--warn)}.hi{font-weight:700;color:var(--g1)}
+.legend{background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:6px;font-size:.78rem;line-height:1.6;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.dim .basemap{filter:grayscale(1) brightness(1.07) contrast(.85);opacity:.6}
+.dim .leaflet-tile-pane{background:#fff}
+.unit-ico{background:none;border:0}
+.lead{display:grid;gap:6px}
+.lx-head{font-size:1rem;color:var(--ink)}
+.lx-head small{color:var(--sub);font-size:.8rem;margin-left:4px}
+.lx-line{display:block;line-height:1.65;padding-left:86px;text-indent:-86px}
+.lx-line>*{text-indent:0}
+.lx-tag{display:inline-block;width:76px;margin-right:10px;box-sizing:border-box;white-space:nowrap;padding:0 7px;border-radius:5px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-size:.76rem;font-weight:700;text-align:center;vertical-align:1px}
+.lx-tag.chk{background:#fff3dc;color:#8a5a00}
+.unk{display:inline-block;font-size:.68rem;font-weight:700;color:#8a5a00;background:#fff3dc;border-radius:4px;padding:0 4px;margin-left:2px;vertical-align:1px}
+.lx-tag.hl{background:var(--accent);color:#fff}
+.lx{font-weight:700;color:var(--ink);white-space:nowrap}
+.lx.up{color:#14965d}.lx.down{color:#d8494d}.lx.warn{color:#c27a00}.lx.blue{color:#2453c4}
+.lx-chip{display:inline-flex;align-items:center;gap:5px;margin:0 10px 0 0;font-size:.88rem;white-space:nowrap}
+.lx-chip i{width:8px;height:8px;border-radius:50%}
+.lx-chip b{font-weight:700}
+.tbl:not(.yr-all) tr.yr-old{display:none}
+.yr-more{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--sub);font:inherit;font-size:.82rem;cursor:pointer}
+.yr-more:hover{color:var(--ink);border-color:#9aa5b1}
+.yr-more i{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;transition:transform .18s}
+.yr-more[aria-expanded="true"] i{transform:rotate(-135deg);margin-top:3px}
+.lg-arrows{display:flex;align-items:center;gap:4px;margin:2px 0}
+.tr-tbl .ty:not(.open) .tr-d{display:none}
+.tr-tbl .ty-h td{text-align:left;background:color-mix(in srgb,var(--ink) 4%,transparent);cursor:pointer;padding:9px 10px;border-bottom:1px solid var(--line)}
+.tr-tbl .ty-h:hover td{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.tr-tbl .ty-h:focus-visible{outline:2px solid #2468df;outline-offset:-2px}
+.ty-caret{display:inline-block;width:7px;height:7px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(-45deg);margin:0 10px 1px 2px;transition:transform .18s}
+.ty.open .ty-caret{transform:rotate(45deg);margin-bottom:3px}
+.ty-now{font-size:.72rem;font-weight:700;color:#fff;background:var(--accent);border-radius:99px;padding:1px 7px;margin-left:4px}
+.ty-sum{float:right;color:var(--sub);font-size:.82rem}
+.ty-pys{clear:both;display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 0 21px}
+.ty-py{font-size:.74rem;color:var(--sub);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:1px 8px;font-weight:500}
+.ty-py b{color:var(--ink);margin-left:2px}
+.ty-py.in{border-color:#9fb7ea;background:#eef3fd}
+.ac-pyt{width:100%;border-collapse:collapse;font-size:11.5px;margin:0 0 10px}
+.ac-pyt th{background:#f3f6f9;color:#65778d;font-weight:600;padding:5px 6px;text-align:right;position:static}
+.ac-pyt th:first-child,.ac-pyt td:first-child{text-align:left}
+.ac-pyt td{padding:5px 6px;border-bottom:1px solid #edf0f4;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ac-pyt tbody tr:last-child td{border-bottom:0}
+.ac-pyt td.up{color:#14965d;font-weight:700}.ac-pyt td.down{color:#d8494d;font-weight:700}
+.ty-sum b{color:var(--ink)}
+.map-toggles{display:grid;gap:6px;background:var(--panel);padding:7px 8px;border-radius:10px;box-shadow:0 1px 5px rgba(0,0,0,.22);font-family:inherit}
+.mt-group{display:flex;align-items:center;gap:4px}
+.mt-body{display:grid;gap:6px}
+.map-toggles.folded{padding:0;gap:0}
+.map-toggles.folded .mt-body{display:none}
+.mt-fold{display:flex;align-items:center;gap:6px;width:100%;border:0;background:none;padding:0;font:inherit;font-size:.74rem;font-weight:700;color:var(--ink);cursor:pointer}
+.map-toggles:not(.folded) .mt-fold{padding-bottom:5px;border-bottom:1px solid var(--line)}
+.map-toggles.folded .mt-fold{padding:7px 10px}
+.mt-fold em{font-style:normal;font-weight:600;font-size:.68rem;color:#b45309;background:#fef3c7;border-radius:99px;padding:0 6px}
+.mt-fold i{margin-left:auto;width:7px;height:7px;border-right:2px solid #8a98ab;border-bottom:2px solid #8a98ab;transform:rotate(-135deg);margin-top:3px;transition:transform .18s}
+.map-toggles.folded .mt-fold i{transform:rotate(45deg);margin-top:-3px;margin-left:6px}
+.mt-fold-ico{width:12px;height:10px;background:linear-gradient(currentColor 0 0) 0 0/100% 2px no-repeat,linear-gradient(currentColor 0 0) 0 4px/70% 2px no-repeat,linear-gradient(currentColor 0 0) 0 8px/45% 2px no-repeat;opacity:.7}
+.mt-label{font-size:.68rem;color:var(--sub);width:3.2em;flex:none;white-space:nowrap}
+.mt-chip{display:inline-flex;align-items:baseline;gap:3px;border:1.5px solid var(--c);background:var(--c);color:var(--t);border-radius:99px;padding:2px 8px;font:inherit;font-size:.76rem;font-weight:700;cursor:pointer;line-height:1.4;transition:background .15s,color .15s,opacity .15s}
+.mt-chip small{font-size:.66rem;font-weight:600;opacity:.85}
+.mt-chip.off{background:transparent;color:#8a98ab;border-color:#cfd6df;text-decoration:line-through;text-decoration-thickness:1.5px}
+.mt-chip.off small{display:none}
+.mt-chip:hover{filter:brightness(1.06)}
+.mt-chip:focus-visible{outline:2px solid #2468df;outline-offset:2px}
+.lg-schools{display:flex;gap:8px;margin:3px 0}
+.lg-schools span{display:inline-flex;align-items:center;gap:3px}
+/* 아이콘 상자(화살표·여백)는 클릭을 통과시키고 원만 클릭되게 (Leaflet 기본 규칙보다 우선) */
+.leaflet-marker-icon.unit-ico,.leaflet-marker-icon.unit-ico svg{pointer-events:none!important}
+.leaflet-marker-icon.unit-ico svg circle{pointer-events:auto!important;cursor:pointer}
+.arw .body{animation:arBody 1.8s ease-in-out infinite}
+.arw .ch2{animation:arChev 1.8s ease-out infinite}
+.arw .ch1{animation:arChev 1.8s ease-out .22s infinite}
+@keyframes arBody{0%,100%{transform:translateY(1.5px)}50%{transform:translateY(-1.5px)}}
+@keyframes arChev{0%{opacity:0;transform:translateY(6px)}30%{opacity:1;transform:translateY(0)}75%{opacity:1;transform:translateY(-1px)}100%{opacity:0;transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.arw .body,.arw .ch1,.arw .ch2{animation:none}}
+.pick-list{display:grid;gap:4px;margin-top:10px}
+.pick-row{display:grid;grid-template-columns:24px minmax(0,1fr);grid-template-rows:auto auto;column-gap:9px;align-items:center;text-align:left;border:1px solid #e3e8ef;background:#fff;border-radius:9px;padding:7px 9px;font:inherit;cursor:pointer}
+.pick-row:hover{border-color:#2468df;background:#f5f9ff}
+.pick-row:focus-visible{outline:2px solid #2468df;outline-offset:2px}
+.pick-dot{grid-row:1/3;width:24px;height:24px;border-radius:50%;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center}
+.pick-name{font-size:13px;font-weight:600;color:#182941;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pick-meta{font-size:11px;color:#718198}
+.pick-meta b.up{color:#14965d}.pick-meta b.down{color:#d8494d}
+/* 아파트 정보 카드 */
+.acard{--a-ink:#182941;--a-muted:#718198;--a-line:#e0e6ee;--a-green:#14965d;--a-red:#d8494d;--a-blue:#2468df;
+  color:var(--a-ink);font-size:13px;line-height:1.45;position:relative}
+.ac-title{font-size:19px;line-height:1.3;font-weight:700;letter-spacing:-.3px;margin:0 26px 2px 0}
+.ac-sub{font-size:12.5px;color:var(--a-muted);margin-bottom:12px}
+.ac-close{position:absolute;right:0;top:-2px;border:0;background:transparent;color:#8290a2;font-size:20px;cursor:pointer}
+.ac-summary{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--a-line);background:#f8fafc;border-radius:10px;margin-bottom:14px;padding:10px 0}
+.ac-metric{padding:1px 10px;display:flex;align-items:center;gap:7px;min-width:0}
+.ac-metric+.ac-metric{border-left:1px solid var(--a-line)}
+.ac-ico{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:#eef2f7;color:#63758c;flex:none;font-size:13px}
+.ac-ml{font-size:10px;color:var(--a-muted)}
+.ac-mv{font-size:14.5px;font-weight:700;white-space:nowrap}
+.ac-mv small{font-size:10px;font-weight:500;color:var(--a-muted)}
+.ac-mv small.g-상{color:#2453c4}.ac-mv small.g-하{color:var(--a-red)}
+.ac-sec{margin:0 0 14px}
+.ac-sec h4{font-size:14.5px;font-weight:700;margin:0 0 6px;display:flex;align-items:center;justify-content:space-between}
+.ac-sec h4 span{font-size:10px;font-weight:500;color:var(--a-muted)}
+.ac-fac{display:grid;grid-template-columns:22px 58px minmax(0,1fr) auto;gap:6px;align-items:center;padding:7px 1px;border-bottom:1px solid #edf0f4}
+.ac-fac:last-child{border-bottom:0}
+.ac-chk{width:19px;height:19px;border-radius:50%;background:#e4f6ec;color:var(--a-green);display:grid;place-items:center;font-size:11px;font-weight:800}
+.ac-chk.st{background:#fdecee;color:#d7263d}
+.ac-chk.off{background:#f0f2f5;color:#9aa5b1}
+.ac-kind{font-size:10.5px;color:var(--a-muted)}
+.ac-fname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-dist{font-size:13.5px;font-weight:700;color:#60728a;white-space:nowrap}
+.ac-dist.ok{color:var(--a-green)}.ac-dist.st{color:#d7263d}
+.ac-compare{display:grid;grid-template-columns:1fr 46px 1fr;align-items:center;gap:6px;margin:6px 0 10px}
+.ac-box{background:#f2f5f8;border-radius:9px;padding:9px 11px}
+.ac-box.up{background:#ecf8f1}.ac-box.down{background:#f9f1f1}
+.ac-period{font-size:10.5px;color:var(--a-muted)}
+.ac-count{font-size:19px;font-weight:800;margin-top:1px;color:#293b53}
+.ac-box.up .ac-count{color:var(--a-green)}.ac-box.down .ac-count{color:var(--a-red)}
+.ac-trend{display:grid;place-items:center;text-align:center;font-size:10.5px;font-weight:700;color:#8290a2}
+.ac-trend span{font-size:19px;line-height:1}
+.ac-trend.up{color:var(--a-green)}.ac-trend.down{color:var(--a-red)}
+.ac-stats{border-top:1px solid var(--a-line);padding:7px 0 2px}
+.ac-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:4px 8px;padding:3px 1px;font-size:11.5px}
+.ac-row span{color:#697b91}.ac-row b{font-weight:700}.ac-row b.hl{color:var(--a-blue)}.ac-row b.down{color:var(--a-red)}
+.ac-filter{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:10.5px;color:var(--a-muted)}
+.ac-chip{display:inline-flex;align-items:center;background:#edf4ff;color:#1f5fc9;border-radius:99px;padding:4px 9px;font-size:10.5px;font-weight:600}
+.pop-open .leaflet-bottom{z-index:300}
+.ac-x{border-top:1px solid #edf0f4;margin:0;padding:0}
+.ac-x:last-of-type{border-bottom:1px solid #edf0f4}
+.ac-x>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:10px 2px;cursor:pointer;user-select:none}
+.ac-x>summary::-webkit-details-marker{display:none}
+.ac-x>summary h4{margin:0;font-size:14px;font-weight:700;flex:none}
+.ac-x>summary:hover h4{color:#2468df}
+.ac-x>summary:focus-visible{outline:2px solid #2468df;outline-offset:2px;border-radius:6px}
+.ac-peek{flex:1;min-width:0;text-align:right;font-size:11.5px;color:#718198;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-peek b{color:#182941}.ac-peek b.up{color:#14965d}.ac-peek b.down{color:#d8494d}
+.ac-caret{flex:none;width:8px;height:8px;border-right:2px solid #8a98ab;border-bottom:2px solid #8a98ab;transform:rotate(45deg);margin:-4px 2px 0 2px;transition:transform .18s}
+.ac-x[open]>summary .ac-caret{transform:rotate(-135deg);margin-top:4px}
+.ac-xbody{padding:0 0 12px}
+.ac-basis{font-size:10.5px;color:#718198;text-align:right;margin-top:-4px}
+.ac-x+.ac-cta,.ac-x~.ac-cta{margin-top:12px}
+.ac-sales{width:100%;border-collapse:collapse;font-size:11px}
+.ac-sales th{background:#f3f6f9;color:#65778d;text-align:left;font-weight:600;padding:7px 6px;position:static}
+.ac-sales th:first-child{border-radius:6px 0 0 6px}
+.ac-sales th:last-child{border-radius:0 6px 6px 0;text-align:right}
+.ac-sales td{padding:8px 6px;border-bottom:1px solid #edf0f4;white-space:nowrap;text-align:left}
+.ac-sales td:last-child{text-align:right;font-weight:700}
+.ac-sales tbody tr:last-child td{border-bottom:0}
+.ac-sales .d{color:#43566e}
+.ac-empty{font-size:12px;color:var(--a-muted);margin:4px 0}
+.ac-cta{width:100%;border:1px solid #d4e3ff;background:#eef4ff;color:#1760ce;border-radius:8px;padding:10px 12px;font:inherit;font-weight:700;margin-top:8px;cursor:pointer}
+.ac-cta:hover{background:#e2edff}
+.apt-pop .leaflet-popup-content-wrapper{border-radius:14px;box-shadow:0 10px 35px #2236502e}
+.apt-pop .leaflet-popup-content{margin:18px 18px 14px;overflow:visible}
+.apt-pop a.leaflet-popup-close-button{top:8px;right:8px;font-size:20px;color:#8290a2}
+.acard-wrap{border:1px solid var(--line);border-radius:14px;padding:18px 18px 4px;margin:12px 0 4px;background:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .acard-wrap{background:#fff}}
+.up{color:#16a34a}.down{color:#d7263d}
+.unit-ico svg{display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.25))}
+.dim-btn{font:inherit;font-size:.78rem;padding:5px 9px;background:#fff;color:#1d2733;border:2px solid rgba(0,0,0,.2);border-radius:4px;cursor:pointer}
+.leaflet-tooltip.st{background:rgba(255,255,255,.85);border:0;color:#a3142a;font-weight:700;font-size:10.5px;padding:0 4px;box-shadow:none}
+.leaflet-tooltip.un{background:rgba(255,255,255,.88);border:0;color:#1d2733;font-size:11px;font-weight:500;padding:0 4px;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.leaflet-tooltip.un:before{display:none}
+.z-lo .leaflet-tooltip.st,.z-mid .leaflet-tooltip.un{display:none}
+.leaflet-tooltip.st:before{display:none}
+.legend .sw{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:6px;vertical-align:3px}
+.leaflet-tooltip.dl{background:transparent;border:0;box-shadow:none;font-weight:700;font-size:15px;color:#1d2733;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
+.only{font-size:.84rem;display:inline-flex;align-items:center;gap:4px;margin-left:6px;cursor:pointer}
+.fbar .rooms{display:inline-flex;align-items:center;gap:6px;font-size:.84rem}
+.fbar .rooms label{gap:2px}
+.fbar .rooms input{width:auto;margin:0}
+.fbar label{font-size:.84rem;display:inline-flex;align-items:center;gap:4px}
+.fbar input{width:4.2em;font:inherit;font-size:.84rem;padding:3px 5px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink)}
+details.cfg{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:10px 0 4px}
+details.cfg summary{cursor:pointer;font-weight:500;font-size:.9rem}
+.cfg-grid{display:grid;grid-template-columns:auto repeat(2,minmax(0,8em));gap:6px 10px;align-items:center;margin:10px 0;font-size:.84rem}
+.cfg-grid .h{color:var(--sub);font-size:.76rem}
+.cfg input[type=number]{width:100%;font:inherit;font-size:.84rem;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink)}
+.cfg .btns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.cfg button{font:inherit;font-size:.82rem;padding:5px 10px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--ink);cursor:pointer}
+.cfg button.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.cfg button[aria-pressed="true"]{background:#16a34a;color:#fff;border-color:#16a34a}
+.cfg ul{margin:6px 0;padding-left:18px;font-size:.82rem}
+.cfg li button{font-size:.74rem;padding:1px 6px;margin-left:6px}
+.adding #map{cursor:crosshair}
+.fac-popup .leaflet-popup-content-wrapper{border-radius:14px;box-shadow:0 10px 30px #22365029}
+.fac-popup .leaflet-popup-content{margin:14px 16px 14px}
+.fac-popup a.leaflet-popup-close-button{top:6px;right:6px;font-size:18px;color:#8290a2}
+.fp{font-size:13px;color:#182941;line-height:1.45}
+.fp-head{display:flex;gap:10px;align-items:center;margin-right:14px}
+.fp-ico{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;background:#16a34a}
+.fp-ico.station{background:#d7263d}.fp-ico.school{background:none;width:34px;height:34px}
+.school-ico{background:none;border:0}
+.school-ico svg{display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.3))}
+.fp-name{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.fp-kind{font-size:11.5px;color:#718198}
+.fac-range:empty{display:none}
+.fp-stat{display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 0;padding:9px 11px;background:#f6f8fb;border-radius:9px;font-size:12px;color:#697b91}
+.fp-stat b{font-size:16px;color:#182941}
+.fp-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.fp-chip{border:1px solid #d9e2ee;background:#fff;color:#2b4366;border-radius:99px;padding:3px 9px;font:inherit;font-size:11.5px;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-chip:hover{border-color:#2468df;color:#2468df;background:#f2f7ff}
+.fp-more{font-size:11.5px;color:#718198;align-self:center}
+.fp-actions{margin-top:12px;padding-top:10px;border-top:1px solid #edf0f4;display:flex;justify-content:flex-end}
+.fp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #e3e8ef;background:#fff;color:#5b6775;border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.fp-btn:hover{background:#fff4f4;border-color:#f3c5c8;color:#c23a42}
+.fp-btn:focus-visible,.fp-chip:focus-visible{outline:2px solid #2468df;outline-offset:2px}
+.fp-btn.primary{width:100%;justify-content:center;background:#2468df;border-color:#2468df;color:#fff;padding:9px 12px;margin-top:4px}
+.fp-btn.primary:hover{background:#1c58c2;border-color:#1c58c2;color:#fff}
+.fac-form{display:grid;gap:9px}
+.fp-field{display:grid;gap:4px;font-size:11.5px;color:#718198}
+.fp-field input,.fp-field select{font:inherit;font-size:13px;color:#182941;padding:8px 10px;border:1px solid #d9e2ee;border-radius:8px;background:#fff;width:100%}
+.fp-field input:focus,.fp-field select:focus{outline:none;border-color:#2468df;box-shadow:0 0 0 3px #2468df22}
+/* ---------- 모바일: 지도 전체 화면 + 아래에서 끌어올리는 패널(바텀시트) ---------- */
+.sheet-handle,.info-btn{display:none}
+.legend-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;background:none;font:inherit;font-weight:600;font-size:.8rem;padding:0;color:var(--ink);cursor:pointer}
+.legend-toggle i{width:7px;height:7px;border-right:2px solid #8a98ab;border-bottom:2px solid #8a98ab;transform:rotate(-135deg);margin-top:3px;transition:transform .18s}
+.legend.collapsed .legend-toggle i{transform:rotate(45deg);margin-top:-3px}
+.legend.collapsed .legend-body{display:none}
+.legend:not(.collapsed) .legend-toggle{margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+@media (max-width:900px){
+  header{padding:10px 14px 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h1{font-size:1.02rem;flex:1;min-width:0}
+  .info-btn{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--sub);font:inherit;font-size:.85rem;cursor:pointer}
+  .cond{display:none;flex-basis:100%;font-size:.76rem}
+  header.open .cond{display:block}
+  .wrap{display:block;position:relative}
+  #map{position:absolute;inset:0;height:auto;border:0}
+  .panel{position:absolute;left:0;right:0;bottom:0;z-index:1100;height:var(--sheet-h,46%);max-height:calc(100% - 8px);
+    border-radius:16px 16px 0 0;box-shadow:0 -6px 24px rgba(20,30,45,.18);padding:0 14px calc(28px + env(safe-area-inset-bottom,0px));
+    transition:height .22s ease;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .panel.dragging{transition:none}
+  .sheet-handle{display:flex;justify-content:center;align-items:center;position:sticky;top:0;z-index:2;background:var(--panel);
+    margin:0 -14px 4px;padding:8px 0 6px;border:0;width:calc(100% + 28px);cursor:grab;touch-action:none;color:var(--sub);font:inherit;font-size:.72rem;gap:8px}
+  .sheet-handle::before{content:"";width:42px;height:5px;border-radius:3px;background:#c9d1db}
+  .bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .bar::-webkit-scrollbar{display:none}
+  .bar .lbl{flex:none}
+  .bar .pill,.bar label,.bar span{flex:none}
+  .fbar{flex-wrap:wrap;overflow:visible}
+  .fbar input{width:3.6em}
+  h2{font-size:1rem;margin-top:20px}
+  .lead{font-size:.88rem;padding:10px 12px}
+  .chart{height:210px}
+  table{font-size:.8rem}
+  th,td{padding:6px 5px}
+  .acard-wrap{padding:14px 12px 2px;margin:8px 0 4px}
+  .legend{font-size:.72rem;padding:6px 8px;max-width:58vw}
+
+  .basemap-status{display:none}
+  .dim-btn{font-size:.72rem;padding:4px 7px}
+  .leaflet-bottom{bottom:var(--sheet-px,0px);transition:bottom .22s ease}
+}
+
+/* ---------- 상단 필터 · 접근성 기준 (시안 반영) ---------- */
+.top-filters{--g:#167653;--gbg:#eaf4f0;--gline:#d5e9e0;margin:2px -22px 12px;padding:4px 22px 14px;border-bottom:1px solid var(--line)}
+.filter-line{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;margin-top:10px}
+.filter-label{font-size:.72rem;font-weight:700;color:var(--sub)}
+.top-filters .chips,.fcond,.view-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rchip{padding:6px 12px;border:1px solid var(--line);border-radius:18px;color:var(--ink);background:var(--panel);font:inherit;font-size:.8rem;cursor:pointer;transition:background .15s,border-color .15s}
+.rchip:hover{border-color:#9aa5b1}
+.rchip[aria-pressed="true"]{background:#27384b;border-color:#27384b;color:#fff;font-weight:700}
+.range-group{display:inline-flex;align-items:center;gap:5px;margin-right:4px}
+.tiny{color:var(--sub);font-size:.74rem}
+.input-wrap{height:30px;display:flex;align-items:center;gap:3px;border:1px solid #dce2e8;border-radius:6px;padding:0 8px;background:var(--panel);transition:border-color .15s,box-shadow .15s}
+.input-wrap:focus-within{border-color:#18815f;box-shadow:0 0 0 3px #18815f1f}
+.input-wrap input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;font-size:.82rem;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.input-wrap input::-webkit-outer-spin-button,.input-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.input-wrap.sm{width:52px}
+.input-wrap.md{width:66px}
+.input-wrap input::placeholder{color:#b3bcc7}
+.unit{white-space:nowrap;color:#8c97a5;font-size:.7rem}
+.rooms{display:inline-flex;align-items:center;gap:4px;margin-right:4px}
+.room{position:relative;cursor:pointer}
+.room input{position:absolute;opacity:0;pointer-events:none}
+.room span{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border:1px solid #dce2e8;border-radius:6px;font-size:.8rem;color:var(--ink);background:var(--panel);transition:all .15s}
+.room input:checked+span{background:var(--gbg);border-color:#9fd0b9;color:var(--g);font-weight:700}
+.room input:focus-visible+span{outline:2px solid #18815f;outline-offset:2px}
+.apply-top{height:30px;padding:0 14px;border:0;border-radius:6px;background:var(--gbg);color:var(--g);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+.apply-top:disabled{background:#f1f3f5;color:#a3adb8;cursor:default}
+.apply-top.dirty{background:#18815f;color:#fff;box-shadow:0 0 0 3px #18815f26}
+.view-chip{padding:6px 12px;border-radius:16px;border:1px solid var(--line);color:var(--sub);background:var(--panel);font:inherit;font-size:.8rem;cursor:pointer}
+.view-chip[aria-pressed="true"]{color:var(--g);background:var(--gbg);border-color:var(--gline);font-weight:700}
+.top-filters .check{display:inline-flex;align-items:center;gap:5px;color:var(--sub);font-size:.8rem;white-space:nowrap;margin-left:4px;cursor:pointer}
+.top-filters .check input{accent-color:#167b5a;width:15px;height:15px}
+
+#cfg{border:1px solid #dce4e9;border-radius:10px;overflow:hidden;background:var(--panel);box-shadow:0 2px 8px #20304008;margin:0 0 6px}
+#cfg .acc-head{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;background:#f8fafb;border:0;border-bottom:1px solid #e9edf1;cursor:pointer;font:inherit;text-align:left;color:var(--ink)}
+#cfg.collapsed .acc-head{border-bottom:0}
+#cfg .head-left{display:flex;align-items:center;gap:9px}
+#cfg .chevron{width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:#eaf4f0;color:#187958;font-size:12px;transition:transform .18s}
+#cfg.collapsed .chevron{transform:rotate(-90deg)}
+#cfg .acc-title{font-weight:700;font-size:.9rem}
+#cfg .saved{font-size:.7rem;color:#8994a2;padding:1px 7px;border-radius:99px;background:#f0f3f6}
+#cfg .saved.dirty{color:#b45309;background:#fef3c7}
+#cfg .summary{color:#818d9b;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cfg.collapsed .acc-body{display:none}
+#cfg .acc-body{padding:14px}
+#cfg .intro{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+#cfg .intro p{margin:0;color:#788495;font-size:.76rem;line-height:1.6}
+#cfg .help{width:20px;height:20px;flex:none;border:1px solid #dce2e8;border-radius:50%;color:#8994a2;background:#fff;font-size:.7rem;cursor:help}
+#cfg .section-title{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px}
+#cfg .section-title strong{font-size:.8rem}
+#cfg .section-title span{font-size:.72rem;color:#929cab}
+#cfg .settings{border:1px solid #e8edf1;border-radius:8px;overflow:hidden}
+#cfg .col-head,#cfg .setting-row{display:grid;grid-template-columns:minmax(120px,1fr) 108px 96px;gap:10px;align-items:center;padding:7px 10px}
+#cfg .col-head{background:#f7f9fa;color:#8792a0;font-size:.7rem}
+#cfg .setting-row{min-height:44px;border-top:1px solid #edf0f3}
+#cfg .name{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600}
+#cfg .icon{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:#f0f4f6}
+#cfg .icon.st{background:#d7263d;color:#fff;font-size:.72rem;font-weight:700}
+#cfg .grade-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#cfg .grade{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #e8edf1;border-radius:7px}
+#cfg .grade>span{font-size:.76rem;color:#647184;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+#cfg .gdot{width:9px;height:9px;border-radius:50%}
+#cfg .grade .input-wrap{width:92px}
+#cfg .weight-footer{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding:9px 11px;border-radius:7px;background:#f4f8f6}
+#cfg .weight-footer span{font-size:.76rem;color:#697789}
+#cfg .total{font-size:.8rem;color:#147653;font-weight:700}
+#cfg .total.warn{color:#b45309}#cfg .total.bad{color:#c54545}
+#cfg .facility-box{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px;border:1px solid #e8edf1;border-radius:8px;background:#fbfcfd}
+#cfg .facility-copy{color:#647184;font-size:.74rem;line-height:1.55}
+#cfg .facility-copy b{display:block;color:#425164;font-size:.78rem}
+#cfg .facility-actions{display:flex;gap:6px;flex:none}
+#cfg .btn{height:32px;padding:0 11px;border:1px solid #dce2e8;border-radius:6px;background:#fff;color:#566375;font:inherit;font-size:.76rem;white-space:nowrap;cursor:pointer}
+#cfg .btn.add{color:#167653;border-color:#cfe3da;background:#f4faf7;font-weight:700}
+#cfg .btn.add[aria-pressed="true"]{background:#18815f;border-color:#18815f;color:#fff}
+#cfg #facList ul{margin:8px 0 0;padding-left:18px;font-size:.78rem}
+#cfg #facList li button{font:inherit;font-size:.72rem;padding:1px 7px;margin-left:6px;border:1px solid #dce2e8;border-radius:5px;background:#fff;cursor:pointer}
+#cfg .acc-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #edf0f3}
+#cfg .reset{border:0;background:none;color:#7b8796;font:inherit;font-size:.76rem;text-decoration:underline;cursor:pointer;padding:0}
+#cfg .footer-right{display:flex;align-items:center;gap:10px}
+#cfg .saved-time{font-size:.7rem;color:#9aa5b1}
+#cfg .save{height:34px;padding:0 16px;border:0;border-radius:6px;background:#18815f;color:#fff;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
+#cfg .save:disabled{background:#cfd8d4;cursor:default}
+.toast{position:fixed;right:24px;bottom:22px;z-index:3000;padding:11px 15px;background:#253548;color:#fff;border-radius:7px;opacity:0;transform:translateY(6px);transition:.2s;font-size:.82rem;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+@media (max-width:900px){
+  .top-filters{margin:0 -14px 10px;padding:0 14px 12px}
+  .top-filters .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .top-filters .chips::-webkit-scrollbar{display:none}
+  .rchip{flex:none}
+  #cfg .summary{display:none}
+  #cfg .col-head,#cfg .setting-row{grid-template-columns:minmax(92px,1fr) 88px 78px;gap:6px}
+  #cfg .facility-box{flex-direction:column;align-items:stretch}
+  #cfg .grade-row{grid-template-columns:1fr}
+  #cfg .facility-actions .btn{flex:1}
+  .toast{left:16px;right:16px;bottom:calc(16px + var(--sheet-px,0px))}
+}
+
+@media (max-width:900px){.splitter{display:none}}
+/* ---------- 모바일 상단 필터 ---------- */
+.mf-bar,.mf-dim,.mf-panel{display:none}
+@media (max-width:900px){
+  .mf-bar{display:block;flex-basis:100%;margin-top:6px}
+  .mf-btn{display:flex;align-items:center;gap:8px;width:100%;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font:inherit;font-size:.82rem;cursor:pointer;text-align:left}
+  .mf-btn b{flex:none;color:#167653;font-size:.8rem}
+  .mf-sum{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+  .mf-ico{flex:none;width:14px;height:11px;background:linear-gradient(#167653 0 0) 0 0/100% 2px no-repeat,linear-gradient(#167653 0 0) 0 4.5px/70% 2px no-repeat,linear-gradient(#167653 0 0) 0 9px/40% 2px no-repeat}
+  .mf-btn i{flex:none;width:7px;height:7px;border-right:2px solid #8a98ab;border-bottom:2px solid #8a98ab;transform:rotate(45deg);margin:-3px 2px 0 0;transition:transform .18s}
+  .mf-open .mf-btn{border-color:#9fd0b9;background:#eaf4f0}
+  .mf-open .mf-btn i{transform:rotate(-135deg);margin-top:3px}
+  .mf-dim{position:absolute;inset:0;z-index:1250;background:rgba(20,30,45,.32)}
+  .mf-panel{position:absolute;top:0;left:0;right:0;z-index:1300;max-height:82%;overflow-y:auto;overscroll-behavior:contain;background:var(--panel);
+    border-radius:0 0 16px 16px;box-shadow:0 10px 28px rgba(20,30,45,.22);padding:0 14px}
+  .mf-open .mf-dim{display:block}
+  .mf-open .mf-panel{display:block;animation:mfDown .2s ease-out}
+  @keyframes mfDown{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+  .mf-slot .top-filters{margin:0 -14px 10px;padding:2px 14px 12px}
+  .mf-slot .top-filters .chips{flex-wrap:wrap}
+  .mf-slot #cfg{margin-bottom:8px}
+  .mf-foot{position:sticky;bottom:0;background:var(--panel);padding:10px 0 12px;border-top:1px solid var(--line)}
+  .mf-close{width:100%;height:40px;border:0;border-radius:9px;background:#27384b;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+}
+
+/* ---------- 범례 안 표시 버튼 · 축척 ---------- */
+.lg-tg{display:grid;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.legend.collapsed .lg-tg{display:none}
+.legend-toggle .lg-title{margin-right:auto}
+.lg-hidden em{font-style:normal;font-weight:600;font-size:.68rem;color:#b45309;background:#fef3c7;border-radius:99px;padding:0 6px;margin-right:6px}
+.leaflet-control-scale-line{border-color:#5b6775;color:#3d4b5c;background:rgba(255,255,255,.85);font-size:11px;line-height:1.3}
+/* ---------- 모바일: 네이버 지도형 화면 ---------- */
+.mq-chips,.fab-col,.fab-fit,.mf-head{display:none}
+@media (max-width:900px){
+  #hdr{position:absolute;left:0;right:0;top:0;z-index:1150;background:transparent;border:0;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0;pointer-events:none;display:block}
+  #hdr>*{pointer-events:auto}
+  #hdr h1,#hdr .info-btn,#hdr .cond{display:none}
+  .mf-bar{margin:0}
+  .mf-btn{height:52px;border:0;border-radius:26px;background:#fff;box-shadow:0 2px 12px rgba(20,30,45,.2);padding:0 18px;font-size:.92rem;gap:10px}
+  .mf-btn b{font-size:.86rem}
+  .mf-ico{width:16px;height:13px}
+  .mq-chips{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .mq-chips::-webkit-scrollbar{display:none}
+  .qchip{flex:none;height:36px;padding:0 15px;border:0;border-radius:18px;background:#fff;color:#1d2733;box-shadow:0 1px 6px rgba(20,30,45,.18);font:inherit;font-size:.86rem;font-weight:600;cursor:pointer}
+  .qchip[aria-pressed="true"]{background:#27384b;color:#fff}
+  .fab-col{display:grid;gap:10px;position:absolute;right:12px;top:calc(124px + env(safe-area-inset-top,0px));z-index:1100}
+  .fab{width:46px;height:46px;border:0;border-radius:50%;background:#fff;color:#27384b;box-shadow:0 2px 10px rgba(20,30,45,.2);display:grid;place-items:center;cursor:pointer;padding:0}
+  .fab[aria-pressed="true"]{background:#27384b;color:#fff}
+  .fab-fit{display:grid;position:absolute;right:12px;bottom:calc(var(--sheet-px,0px) + 14px);z-index:1100;transition:bottom .22s ease}
+  .leaflet-control-zoom,.dim-btn{display:none!important}
+  .leaflet-top{top:calc(116px + env(safe-area-inset-top,0px))}
+  .leaflet-top.leaflet-right{right:62px}
+  .leaflet-control-layers:not(.leaflet-control-layers-expanded){display:none}
+  .leaflet-control.legend:not(.m-show){display:none}
+  .leaflet-control.legend.m-show{max-height:calc(100vh - var(--sheet-px,0px) - 190px);overflow-y:auto;max-width:72vw}
+  .leaflet-bottom.leaflet-right{right:66px}
+  /* 필터: 네이버 검색 화면처럼 전체 화면 */
+  .mf-dim{display:none!important}
+  .mf-panel{position:fixed;inset:0;z-index:2000;max-height:none;border-radius:0;padding:0 14px;box-shadow:none}
+  .mf-open .mf-panel{animation:mfIn .18s ease-out}
+  @keyframes mfIn{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+  .mf-head{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:2;background:var(--panel);margin:0 -14px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;border-bottom:1px solid var(--line)}
+  .mf-head b{font-size:1rem}
+  .mf-head-sum{font-size:.76rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70vw}
+  .mf-back{width:40px;height:40px;border:0;border-radius:50%;background:#f0f2f5;color:#1d2733;display:grid;place-items:center;cursor:pointer;flex:none}
+  .mf-foot{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  /* 단지 시트 머리: 장소 카드 형식 */
+  .uh{padding:4px 2px 12px}
+  .uh-top{display:flex;align-items:flex-start;gap:10px}
+  .uh-title{flex:1;margin:4px 0 6px;font-size:1.45rem;font-weight:800;letter-spacing:-.4px;line-height:1.25}
+  .uh-x{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:#eef1f4;color:#3d4b5c;font-size:22px;line-height:1;cursor:pointer}
+  .uh-meta{font-size:.92rem;color:#4b5868;margin:2px 0}
+  .uh-meta b{color:var(--ink)}
+  .uh-g{font-weight:700}.uh-g.g-상{color:#2453c4}.uh-g.g-중{color:#c27a00}.uh-g.g-하{color:#6b7684}
+  .uh-actions{display:flex;gap:8px;overflow-x:auto;margin-top:14px;scrollbar-width:none}
+  .uh-actions::-webkit-scrollbar{display:none}
+  .uh-btn{flex:none;display:inline-flex;align-items:center;height:42px;padding:0 18px;border:1px solid #dfe3e8;border-radius:21px;background:#fff;color:#1d2733;font:inherit;font-size:.9rem;font-weight:600;text-decoration:none;cursor:pointer}
+  .uh-btn.primary{background:#e8f0ff;border-color:#e8f0ff;color:#1f5fd6}
+  #view>p:has(>#backBtn){display:none}          /* 모바일은 머리의 × 로 목록 복귀 */
+  .acard-wrap .ac-title,.acard-wrap .ac-sub{display:none}
+  .panel{border-radius:20px 20px 0 0;z-index:1200}   /* 시트를 끝까지 올리면 위의 필터 바·칩을 덮음 */
+}
+
+/* ---------- 거리 재기 ---------- */
+.meas-ctl{margin-top:8px!important}
+.meas-btn{display:grid;place-items:center;gap:1px;width:46px;height:50px;border:2px solid rgba(0,0,0,.2);border-radius:6px;background:#fff;color:#3d4b5c;font:inherit;font-size:.66rem;font-weight:600;cursor:pointer;padding:3px 0 2px;background-clip:padding-box}
+.meas-btn svg{width:20px;height:20px}
+.meas-btn[aria-pressed="true"]{color:#e5156b;border-color:#e5156b}
+.measuring{cursor:crosshair!important}
+/* 재는 동안엔 단지·학교·동 경계를 눌러도 선택되지 않고 점이 찍히게 */
+.measuring .leaflet-interactive,.measuring .leaflet-marker-icon,.measuring .leaflet-marker-icon *,
+.measuring .leaflet-marker-icon.unit-ico svg circle{pointer-events:none!important}
+.meas-tip{background:#fff;border:1.5px solid #e5156b;border-radius:4px;color:#e5156b;font-weight:700;font-size:12px;padding:1px 6px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.meas-tip:before{display:none}
+.meas-tip small{margin-left:5px;color:#8a98ab;font-weight:600;font-size:10.5px}
+.meas-tip.last{background:#e5156b;color:#fff}
+.meas-tip.last small{color:#ffd1e3}
+.meas-tip.ghost{border-style:dashed;color:#e5156b;background:rgba(255,255,255,.92);font-weight:600}
+.meas-box{display:none;position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:900;min-width:250px;max-width:calc(100% - 24px);
+  background:#fff;border-radius:12px;box-shadow:0 4px 18px rgba(20,30,45,.22);padding:10px 12px 8px;font-size:13px;color:#182941}
+.meas-box.show{display:block}
+.mb-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+.mb-main b{font-size:1.25rem;color:#e5156b;margin-left:6px;font-variant-numeric:tabular-nums}
+.mb-lbl{color:#5b6775;font-weight:600}
+.mb-hint{color:#5b6775;font-weight:600}
+.mb-time{display:flex;gap:10px;color:#5b6775;font-size:.82rem;white-space:nowrap}
+.mb-time b{color:#182941}
+.mb-acts{display:flex;gap:6px;margin-top:8px}
+.mb-acts button{flex:1;height:32px;border:1px solid #dfe3e8;border-radius:8px;background:#fff;color:#3d4b5c;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
+.mb-acts button:disabled{color:#b6bec8;cursor:default}
+.mb-acts .mb-primary{background:#e5156b;border-color:#e5156b;color:#fff}
+.mb-note{margin-top:6px;font-size:.7rem;color:#8a98ab;text-align:center}
+@media (max-width:900px){
+  .meas-ctl{display:none}
+  .meas-box{top:calc(124px + env(safe-area-inset-top,0px));left:12px;right:70px;transform:none;min-width:0;max-width:none}
+  .fab#fabMeas[aria-pressed="true"]{background:#e5156b;color:#fff}
+}
+
+/* ---------- PC 단지 카드: 지도 왼쪽 고정 (펼쳐도 지도가 움직이지 않음) ---------- */
+.wrap{position:relative}
+.unit-dock{display:none;position:absolute;left:12px;top:12px;z-index:1100;width:min(380px,calc(var(--mapw,49%) - 40px));max-height:calc(100% - 24px);
+  overflow-y:auto;overscroll-behavior:contain;background:#fff;border-radius:14px;box-shadow:0 10px 35px #2236502e;padding:18px 10px 14px 18px;
+  scrollbar-width:thin;scrollbar-color:#cfd6df transparent;scrollbar-gutter:stable}   /* 스크롤바 자리를 항상 비워 둬서 길어져도 카드 폭이 그대로 */
+.unit-dock::-webkit-scrollbar{width:8px}
+.unit-dock::-webkit-scrollbar-track{background:transparent}
+.unit-dock::-webkit-scrollbar-thumb{background:#cfd6df;border-radius:8px;border:2px solid #fff}
+.unit-dock::-webkit-scrollbar-thumb:hover{background:#aab4c0}
+.unit-dock.open{display:block;animation:dockIn .16s ease-out}
+@keyframes dockIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.unit-dock .ac-close{right:0;top:-4px}
+.dock-open .leaflet-top.leaflet-left,.dock-open .leaflet-bottom.leaflet-left{left:var(--dockw,404px)}
+.leaflet-marker-icon.unit-ico.sel svg{filter:drop-shadow(0 0 0 #fff) drop-shadow(0 0 4px #2468df) drop-shadow(0 0 8px #2468df)}
+.leaflet-marker-icon.unit-ico.sel{z-index:2000!important}
+.unit-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:10px 0 2px}
+.unit-h h2{margin:0;font-size:1.25rem}
+.unit-h span{color:var(--sub);font-size:.85rem}
+.unit-h .pill{margin-left:auto;font-size:.78rem;padding:4px 10px}
+@media (max-width:900px){.unit-dock{display:none!important}}
+
+/* ---------- 모바일 필터 정리 · 기준 아래쪽 버튼 ---------- */
+@media (max-width:900px){
+  .mf-slot .filter-line{grid-template-columns:1fr;gap:6px;margin-top:12px}
+  .mf-slot .filter-label{font-size:.76rem}
+  .mf-slot .fcond{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;align-items:center}
+  .mf-slot .range-group{display:flex;margin:0;min-width:0;gap:4px}
+  .mf-slot .range-group .tiny{flex:none}
+  .mf-slot .range-group .input-wrap{width:auto;flex:1 1 0;min-width:0;padding:0 6px}
+  .mf-slot .rooms{margin:0}
+  .mf-slot .apply-top{justify-self:end;min-width:72px}
+  #cfg .acc-footer{flex-wrap:wrap;row-gap:8px}
+  #cfg .footer-right{display:contents}
+  #cfg .saved-time{order:-1;flex-basis:100%;text-align:right}
+  #cfg .reset,#cfg .save{white-space:nowrap}
+  #cfg .save{margin-left:auto}
+  .lx-head small{display:none}                     /* 조건은 위쪽 필터 바에 있으므로 시트 요약에선 생략 */
+}
+
+/* 재건축 구분 배지 */
+.rz-pill{display:inline-block;font-size:.72rem;font-weight:700;line-height:1.5;border-radius:4px;padding:0 6px;vertical-align:1px;white-space:nowrap;color:#fff}
+.rz-pill.rz1{background:#6d28d9}.rz-pill.rz2{background:#1f4fb8}
+.rz-pill.rzx{background:#e11d48}
+.ac-rz{margin:-6px 0 10px}
+.ac-rz .rz-pill{white-space:normal;font-size:.76rem;padding:2px 8px;line-height:1.45}
+.uh-meta .rz-pill{font-size:.8rem;padding:2px 8px;white-space:normal}
+.lg-rz{display:flex;align-items:center;gap:4px;margin:2px 0}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <h1>분당 5개 동 아파트 매매 브리핑</h1>
+  <button class="info-btn" id="infoBtn" aria-label="기준 설명 보기" aria-expanded="false">i</button>
+  <p class="cond" id="cond"></p>
+  <div class="mf-bar"><button class="mf-btn" id="mfBtn" aria-expanded="false" aria-controls="mfPanel">
+    <span class="mf-ico" aria-hidden="true"></span><span class="mf-sum" id="mfSum"></span><b>필터</b><i aria-hidden="true"></i></button></div>
+  <div class="mq-chips" id="quickDong" role="toolbar" aria-label="동 선택"></div>
+</header>
+<div class="wrap">
+  <div class="mf-dim" id="mfDim"></div>
+  <div class="mf-panel" id="mfPanel" role="dialog" aria-label="필터">
+    <div class="mf-head"><button class="mf-back" id="mfBack" aria-label="닫기"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div><b>필터 · 접근성 기준</b><div class="mf-head-sum" id="mfHeadSum"></div></div></div>
+    <div class="mf-slot" id="mfSlot"></div>
+    <div class="mf-foot"><button class="mf-close" id="mfClose">닫기</button></div></div>
+  <div class="fab-col" id="fabCol">
+    <button class="fab" id="fabLayers" title="배경지도"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/></svg></button>
+    <button class="fab" id="fabLegend" title="범례·표시"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg></button>
+    <button class="fab" id="fabDim" title="배경 흐림"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none"/></svg></button>
+    <button class="fab" id="fabMeas" title="거리 재기" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21Z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></svg></button>
+  </div>
+  <button class="fab fab-fit" id="fabFit" title="이 지역 전체 보기"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+  <aside class="unit-dock" id="unitDock" aria-label="선택한 단지 정보"></aside>
+  <div id="map" role="region" aria-label="동 경계와 단지 지도"></div>
+  <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" tabindex="0"
+    aria-label="지도와 정보 영역 크기 조절 (끌거나 좌우 화살표, 두 번 누르면 기본값)" title="끌어서 크기 조절 · 두 번 누르면 기본값"><span class="sp-tip"></span></div>
+  <div class="panel" id="panel">
+    <button class="sheet-handle" id="sheetHandle" aria-label="패널 크기 바꾸기"><span id="sheetHint">끌어올려 자세히 보기</span></button>
+    <div class="top-filters">
+      <div class="filter-line"><div class="filter-label">지역</div>
+        <div class="chips" id="tabs" role="toolbar" aria-label="동 선택"></div></div>
+      <div class="filter-line"><div class="filter-label">조건</div>
+        <div class="fcond" role="group" aria-label="검색 조건">
+          <div class="range-group"><span class="tiny">평형</span>
+            <label class="input-wrap sm"><input type="number" id="fAmin" min="0" max="100" step="1" aria-label="최소 평형"></label><span class="tiny">~</span>
+            <label class="input-wrap sm"><input type="number" id="fAmax" min="1" max="200" step="1" aria-label="최대 평형"><span class="unit">평</span></label></div>
+          <div class="range-group"><span class="tiny">가격</span>
+            <label class="input-wrap sm"><input type="number" id="fPmin" min="0" max="100" step="0.5" aria-label="최소 가격"></label><span class="tiny">~</span>
+            <label class="input-wrap sm"><input type="number" id="fPmax" min="0.5" max="200" step="0.5" aria-label="최대 가격"><span class="unit">억</span></label></div>
+          <div class="range-group"><span class="tiny">세대</span>
+            <label class="input-wrap md"><input type="number" id="fHmin" min="0" step="100" placeholder="0" aria-label="최소 세대수"></label><span class="tiny">~</span>
+            <label class="input-wrap md"><input type="number" id="fHmax" min="0" step="100" placeholder="∞" aria-label="최대 세대수"><span class="unit">세대</span></label></div>
+          <div class="range-group"><span class="tiny">년차</span>
+            <label class="input-wrap sm"><input type="number" id="fYmin" min="0" max="80" step="1" placeholder="–" aria-label="년차 이상"><span class="unit">년</span></label><span class="tiny">이상</span></div>
+          <div class="rooms" role="group" aria-label="방 수"><span class="tiny">방</span>
+            <label class="room"><input type="checkbox" value="1"><span>1</span></label><label class="room"><input type="checkbox" value="2"><span>2</span></label>
+            <label class="room"><input type="checkbox" value="3"><span>3</span></label><label class="room"><input type="checkbox" value="4"><span>4+</span></label></div>
+          <button class="apply-top" id="fApply" disabled>적용</button>
+        </div></div>
+      <div class="filter-line"><div class="filter-label">보기</div>
+        <div class="view-tools" role="toolbar" aria-label="보기 범위">
+          <button class="view-chip" data-scope="filt">필터 조건</button><button class="view-chip" data-scope="area">평형·방만</button>
+          <button class="view-chip" data-scope="all">전체</button>
+          <label class="check"><input type="checkbox" id="onlyMatch"> 필터 해당 단지만</label></div></div>
+    </div>
+    <section class="accordion collapsed" id="cfg">
+      <button class="acc-head" id="cfgHead" aria-expanded="false" aria-controls="cfgBody">
+        <span class="head-left"><span class="chevron" aria-hidden="true">⌄</span><span class="acc-title">접근성 기준</span><span class="saved" id="cfgState">저장됨</span></span>
+        <span class="summary" id="cfgSummary"></span></button>
+      <div class="acc-body" id="cfgBody">
+        <div class="intro"><p>기준 거리 안에 시설이 있으면 도보권으로 보고 가중치 점수에 반영합니다.<br>
+          설정을 바꾼 뒤 <b>변경사항 적용</b>을 눌러 지도 분석에 반영하세요.</p>
+          <button class="help" type="button" title="점수 계산: 기준 거리의 60% 안은 만점, 150%에서 0점. 가중치는 합계 대비 비율로 100점 환산합니다.">?</button></div>
+        <div class="section-title"><strong>시설별 기준</strong><span>거리와 가중치를 입력하세요</span></div>
+        <div class="settings" id="cfgGrid"></div>
+        <div class="section-title"><strong>접근 등급 점수</strong><span>최소 점수 기준</span></div>
+        <div class="grade-row" id="cfgGrades"></div>
+        <div class="weight-footer"><span>가중치 합계</span><strong class="total" id="cfgTotal"></strong></div>
+        <div class="section-title"><strong>학교·역 직접 추가</strong><span>지도에서 위치를 선택해 등록</span></div>
+        <div class="facility-box">
+          <div class="facility-copy"><b>직접 등록한 시설</b>지도에서 지점을 눌러 추가하고, 잘못된 시설은 지도에서 눌러 제외합니다. 내보낸 JSON을 data/public/custom_facilities.json 으로 두면 다음 생성에도 반영돼요.</div>
+          <div class="facility-actions"><button class="btn add" id="addMode" aria-pressed="false">＋ 지도에서 추가</button><button class="btn" id="facExport">JSON 내보내기</button></div>
+        </div>
+        <div id="facList"></div>
+        <div class="acc-footer"><button class="reset" id="cfgReset" type="button">기본값으로 복원</button>
+          <div class="footer-right"><span class="saved-time" id="cfgSavedAt"></span><button class="save" id="cfgApply" disabled>변경사항 적용</button></div></div>
+      </div>
+    </section>
+    <div id="view"></div>
+  </div>
+</div>
+<div class="toast" id="toastbox" role="status" aria-live="polite"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+window.addEventListener('error', ev => {
+  const v = document.getElementById('view');
+  if (v && !v.innerHTML.trim()) v.innerHTML = `<div class="lead" style="border-color:#b5446e"><b>불러오기 오류</b><pre style="white-space:pre-wrap;font-size:.78rem">${String(ev.message)}\n${ev.filename||''}:${ev.lineno||''}</pre></div>`;
+});
+const D = JSON.parse(document.getElementById('data').textContent);
+if ((D.version||0) < 4) console.warn('build_briefing.py 가 구버전입니다. 최신 파일로 교체하세요.');
+const KINDS = ['station','elementary','middle','high'];
+const KLABEL = {station:'역', elementary:'초', middle:'중', high:'고'};
+const KNAME = {station:'지하철역', elementary:'초등학교', middle:'중학교', high:'고등학교'};
+const DONG_COLORS = {'수내동':'#3b6fb6','정자동':'#b5446e','서현동':'#7a5bc2','이매동':'#c46a2b','야탑동':'#2f8f9d'};
+const GRADE_COLORS = {'상':'#2453c4','중':'#e09a00','하':'#9aa5b1'};
+const RAIL = '#d7263d', GREEN = '#16a34a';
+// 학교: 초 진한 녹색, 중 중간 녹색, 고 옅은 녹색 (옅은 바탕엔 진한 글자)
+const SCHOOL = {elementary:{c:'#166534', t:'#fff', l:'초'}, middle:{c:'#22a052', t:'#fff', l:'중'}, high:{c:'#8fd9a8', t:'#14532d', l:'고'}};
+function schoolSvg(k, size=26, custom=false){
+  const S = SCHOOL[k];
+  return `<svg width="${size}" height="${size}" viewBox="0 0 32 32" aria-hidden="true">
+    <g stroke="#fff" stroke-width="2.4" stroke-linejoin="round" fill="none" opacity=".95">
+      <path d="M16 2.5V7 M2 14H9V12L16 6.5L23 12V14H30V28.5H2Z"/></g>
+    <path d="M16 2.5V7" stroke="${S.c}" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M16 2.6h4.2l-1.2 1.3 1.2 1.3H16Z" fill="${S.c}"/>
+    <path d="M2 14H9V12L16 6.5L23 12V14H30V28.5H2Z" fill="${S.c}" ${custom?'stroke="#fff" stroke-dasharray="2 2" stroke-width="1"':''}/>
+    <rect x="1" y="27.6" width="30" height="2.6" rx="1" fill="${S.c}"/>
+    <g fill="${S.t}" opacity=".9"><rect x="3.8" y="16.5" width="3.4" height="3" rx=".5"/><rect x="3.8" y="22" width="3.4" height="3" rx=".5"/>
+      <rect x="24.8" y="16.5" width="3.4" height="3" rx=".5"/><rect x="24.8" y="22" width="3.4" height="3" rx=".5"/>
+      <path d="M13.6 28V25.4a2.4 2.4 0 0 1 4.8 0V28Z"/></g>
+    <circle cx="16" cy="18" r="6.6" fill="#fff" ${k==='high'?'stroke="#14532d" stroke-width=".8"':''}/>
+    <text x="16" y="18.4" text-anchor="middle" dominant-baseline="central" font-size="9.4" font-weight="800" fill="${k==='high'?'#14532d':S.c}"
+      font-family="IBM Plex Sans KR,sans-serif">${S.l}</text></svg>`;
+}
+const schoolIcon = (k, custom) => L.divIcon({html:schoolSvg(k, 30, custom), className:'school-ico', iconSize:[30,30], iconAnchor:[15,28], popupAnchor:[0,-26], tooltipAnchor:[0,-24]});
+const won = v => v==null ? '–' : (v/1e8).toFixed(1).replace(/\.0$/,'')+'억';
+const num = v => v==null ? '–' : Number(v).toLocaleString('ko-KR');
+const m = v => v==null ? '–' : (v>=1000 ? (v/1000).toFixed(1)+'km' : v+'m');
+const pct = v => v==null ? '–' : (v>0?'+':'')+v+'%';
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ymLabel = ym => ym.slice(2,4)+'.'+ym.slice(4);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const med = a => { const x = a.filter(v=>v!=null).sort((p,q)=>p-q); if (!x.length) return null;
+  const h = x.length>>1; return x.length%2 ? x[h] : (x[h-1]+x[h])/2; };
+const dist = (a, b) => { const R = 6371000, r = Math.PI/180, dLat = (b.lat-a.lat)*r, dLng = (b.lng-a.lng)*r;
+  const h = Math.sin(dLat/2)**2 + Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
+const store = { get(k, d){ try { return JSON.parse(localStorage.getItem('bundang:'+k)) ?? d; } catch { return d; } },
+                set(k, v){ try { localStorage.setItem('bundang:'+k, JSON.stringify(v)); } catch {} } };
+let state = {dong:'전체', scope:'filt', unit:null, only: store.get('onlyMatch', true)};
+const SCOPES = ['filt','area','all'], SCOPE_NAME = {filt:'필터 조건', area:'평형·방만', all:'전체'};
+
+/* ---------- 설정 (기준거리·가중치·등급) ---------- */
+const DEF = D.defaults || {walk:{station:700,elementary:400,middle:1000,high:1000}, weight:{station:40,elementary:30,middle:15,high:15}, cuts:[60,30], fullRatio:.6, zeroRatio:1.5};
+let CFG = Object.assign(JSON.parse(JSON.stringify(DEF)), store.get('cfg', {}));
+function toast(msg){
+  const t = document.getElementById('toastbox'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._toastT); window._toastT = setTimeout(() => t.classList.remove('show'), 1900);
+}
+const FAC_ICON = k => k==='station' ? `<span class="icon st">역</span>` : `<span class="icon">${schoolSvg(k, 22)}</span>`;
+function buildCfgForm(){
+  document.getElementById('cfgGrid').innerHTML = `<div class="col-head"><span>시설 유형</span><span>기준 거리</span><span>가중치</span></div>`
+    + KINDS.map(k => `<div class="setting-row"><div class="name">${FAC_ICON(k)}${KNAME[k]}</div>
+      <label class="input-wrap"><input type="number" id="w_${k}" min="50" max="3000" step="50" value="${CFG.walk[k]}" aria-label="${KNAME[k]} 기준 거리"><span class="unit">m</span></label>
+      <label class="input-wrap"><input type="number" class="weight" id="g_${k}" min="0" max="100" step="5" value="${CFG.weight[k]}" aria-label="${KNAME[k]} 가중치"><span class="unit">점</span></label></div>`).join('');
+  document.getElementById('cfgGrades').innerHTML =
+    `<div class="grade"><span><i class="gdot" style="background:${GRADE_COLORS['상']}"></i>우수 (상)</span><label class="input-wrap"><input type="number" id="cut1" min="0" max="100" value="${CFG.cuts[0]}" aria-label="우수 최소 점수"><span class="unit">점 이상</span></label></div>
+     <div class="grade"><span><i class="gdot" style="background:${GRADE_COLORS['중']}"></i>보통 (중)</span><label class="input-wrap"><input type="number" id="cut2" min="0" max="100" value="${CFG.cuts[1]}" aria-label="보통 최소 점수"><span class="unit">점 이상</span></label></div>`;
+  updateCfgUI();
+}
+const cfgForm = () => ({walk:Object.fromEntries(KINDS.map(k => [k, +document.getElementById('w_'+k).value || 0])),
+  weight:Object.fromEntries(KINDS.map(k => [k, +document.getElementById('g_'+k).value || 0])),
+  cuts:[+document.getElementById('cut1').value || 0, +document.getElementById('cut2').value || 0]});
+function updateCfgUI(){
+  const f = cfgForm();
+  const dirty = KINDS.some(k => f.walk[k]!==CFG.walk[k] || f.weight[k]!==CFG.weight[k]) || f.cuts[0]!==CFG.cuts[0] || f.cuts[1]!==CFG.cuts[1];
+  const st = document.getElementById('cfgState');
+  st.textContent = dirty ? '변경됨' : '저장됨'; st.classList.toggle('dirty', dirty);
+  document.getElementById('cfgApply').disabled = !dirty;
+  const sum = KINDS.reduce((a,k) => a + f.weight[k], 0), tot = document.getElementById('cfgTotal');
+  tot.textContent = sum===0 ? '0점 · 하나 이상 입력 필요' : sum===100 ? '100 / 100점 · 적정' : `${sum}점 · 100점으로 비율 환산`;
+  tot.className = 'total' + (sum===0 ? ' bad' : sum===100 ? '' : ' warn');
+  const sch = ['elementary','middle','high'].map(k => CFG.walk[k]);
+  document.getElementById('cfgSummary').textContent =
+    `역 ${num(CFG.walk.station)}m · 학교 ${num(Math.min(...sch))}~${num(Math.max(...sch))}m · 우수 ${CFG.cuts[0]}점↑`;
+  const at = store.get('cfgSavedAt', null);
+  document.getElementById('cfgSavedAt').textContent = at ? `마지막 적용 · ${new Date(at).toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})}` : '기본값 사용 중';
+}
+document.getElementById('cfg').addEventListener('input', e => { if (e.target.matches('#cfgGrid input, #cfgGrades input')) updateCfgUI(); });
+document.getElementById('cfg').addEventListener('keydown', e => { if (e.key==='Enter' && e.target.matches('#cfgGrid input, #cfgGrades input')) document.getElementById('cfgApply').click(); });
+document.getElementById('cfgHead').onclick = () => {
+  const box = document.getElementById('cfg'), open = box.classList.toggle('collapsed') === false;
+  document.getElementById('cfgHead').setAttribute('aria-expanded', open); store.set('cfgOpen', open);
+};
+if (store.get('cfgOpen', false)) { document.getElementById('cfg').classList.remove('collapsed'); document.getElementById('cfgHead').setAttribute('aria-expanded', true); }
+document.getElementById('cfgApply').onclick = () => {
+  const f = cfgForm();
+  if (KINDS.reduce((a,k) => a + f.weight[k], 0) === 0) return toast('가중치를 하나 이상 입력하세요.');
+  KINDS.forEach(k => { CFG.walk[k] = Math.max(50, f.walk[k] || DEF.walk[k]); CFG.weight[k] = Math.max(0, f.weight[k]); });
+  CFG.cuts = [f.cuts[0] || DEF.cuts[0], f.cuts[1] || DEF.cuts[1]];
+  store.set('cfg', {walk:CFG.walk, weight:CFG.weight, cuts:CFG.cuts}); store.set('cfgSavedAt', Date.now());
+  buildCfgForm(); recalc(); toast('접근성 기준을 적용했습니다.');
+};
+document.getElementById('cfgReset').onclick = () => { CFG = JSON.parse(JSON.stringify(DEF)); store.set('cfg', {}); store.set('cfgSavedAt', null);
+  buildCfgForm(); recalc(); toast('기본값으로 복원했습니다.'); };
+
+/* ---------- 시설 (수집 + 사용자 추가 − 제외) ---------- */
+let CUSTOM = store.get('custom', {added:[], excluded:[]});
+const fkey = (k, p) => `${k}|${p.name}`;
+let FAC = {};
+function buildFacilities(){
+  const ex = new Set(CUSTOM.excluded.map(x => x.kind+'|'+x.name));
+  FAC = {};
+  KINDS.forEach(k => {
+    const base = (D.facilities[k]||[]).filter(p => !ex.has(fkey(k,p)));
+    const names = new Set(base.map(p=>p.name));
+    const add = CUSTOM.added.filter(x => x.kind===k && !names.has(x.name) && !ex.has(fkey(k,x))).map(x => ({...x, custom:true}));
+    FAC[k] = base.concat(add);
+  });
+}
+
+/* ---------- 접근성 계산 ---------- */
+function computeUnits(){
+  const avail = KINDS.filter(k => FAC[k].length && CFG.weight[k] > 0);
+  const wsum = avail.reduce((a,k)=>a+CFG.weight[k],0);
+  D.units.forEach(u => {
+    u.near = {}; u.score = null; u.grade = null; u.type = null;
+    if (u.lat == null || !avail.length) return;
+    let sc = 0;
+    KINDS.forEach(k => {
+      if (!FAC[k].length) return;
+      let best = null, bd = Infinity;
+      FAC[k].forEach(p => { const d = dist(u, p); if (d < bd) { bd = d; best = p; } });
+      u.near[k] = [best.name, Math.round(bd)];
+      if (avail.includes(k)) {
+        const full = CFG.walk[k]*CFG.fullRatio, zero = CFG.walk[k]*CFG.zeroRatio;
+        sc += Math.min(1, Math.max(0, (zero - bd)/(zero - full))) * CFG.weight[k];
+      }
+    });
+    u.score = Math.round(sc / wsum * 100);
+    u.grade = u.score >= CFG.cuts[0] ? '상' : u.score >= CFG.cuts[1] ? '중' : '하';
+    const st = u.near.station && u.near.station[1] <= CFG.walk.station;
+    const el = u.near.elementary && u.near.elementary[1] <= CFG.walk.elementary;
+    u.type = st && el ? '역+초교' : st ? '역세권' : el ? '초교 인접' : '일반';
+  });
+}
+
+/* ---------- 필터 ---------- */
+const PY = 3.3058;
+let FILTER = Object.assign({areaMin:24, areaMax:40, priceMin:0, priceMax:15, rooms:[], hhMin:null, hhMax:null, ageMin:null},
+                           DEF.filter||{}, store.get('filter', {}));
+if (!Array.isArray(FILTER.rooms)) FILTER.rooms = [];
+const roomBoxes = [...document.querySelectorAll('.fcond .rooms input')];
+roomBoxes.forEach(b => b.checked = FILTER.rooms.includes(+b.value));
+// 방 수 조건: 아무것도 고르지 않으면 전체. 4는 4개 이상.
+// 정보가 없는 경우(방 수·세대수·년차 미상)는 조건으로 판단할 수 없으므로 빼지 않고 포함 → 상단 '확인' 줄에 몇 건인지 표시
+const roomOK = r => !FILTER.rooms.length || r == null || FILTER.rooms.includes(Math.min(r, 4));
+const between = (x, lo, hi) => x == null || ((lo == null || x >= lo) && (hi == null || x <= hi));
+delete FILTER.ageMax;                                                     // 이전 버전(년차 범위)에서 저장된 값 정리
+// 년차는 'N년차 이상' 하나만 (예: 30 → 30년차 이상)
+const unitOK = u => between(u.households, FILTER.hhMin, FILTER.hhMax) && between(u.age, FILTER.ageMin, null);
+const fIds = {areaMin:'fAmin', areaMax:'fAmax', priceMin:'fPmin', priceMax:'fPmax'};
+const fOpt = {hhMin:'fHmin', hhMax:'fHmax', ageMin:'fYmin'};          // 빈칸 허용
+const optVal = id => { const v = parseFloat(document.getElementById(id).value); return isNaN(v) ? null : v; };
+Object.entries(fIds).forEach(([k,id]) => document.getElementById(id).value = FILTER[k]);
+Object.entries(fOpt).forEach(([k,id]) => document.getElementById(id).value = FILTER[k] ?? '');
+document.getElementById('fApply').addEventListener('click', () => { if (isMobile()) setTimeout(() => setMf(false), 150); });
+document.getElementById('fApply').onclick = () => {
+  Object.entries(fIds).forEach(([k,id]) => { const v = parseFloat(document.getElementById(id).value); if (!isNaN(v)) FILTER[k] = v; });
+  Object.entries(fOpt).forEach(([k,id]) => FILTER[k] = optVal(id));
+  FILTER.rooms = roomBoxes.filter(b => b.checked).map(b => +b.value);
+  if (FILTER.areaMax <= FILTER.areaMin) FILTER.areaMax = FILTER.areaMin + 1;
+  if (FILTER.priceMax < FILTER.priceMin) FILTER.priceMax = FILTER.priceMin;
+  if (FILTER.hhMin != null && FILTER.hhMax != null && FILTER.hhMax < FILTER.hhMin) FILTER.hhMax = FILTER.hhMin;
+  Object.entries(fOpt).forEach(([k,id]) => document.getElementById(id).value = FILTER[k] ?? '');
+  store.set('filter', FILTER); recalc(); markFilterDirty();
+  toast(`조건을 적용했습니다 · 조건 매물 ${num(STATS[state.scope==='all'?'filt':state.scope]['전체'].all.listings)}건`);
+};
+function markFilterDirty(){
+  const v = id => parseFloat(document.getElementById(id).value);
+  const rooms = roomBoxes.filter(b => b.checked).map(b => +b.value);
+  const dirty = v('fAmin')!==FILTER.areaMin || v('fAmax')!==FILTER.areaMax || v('fPmin')!==FILTER.priceMin || v('fPmax')!==FILTER.priceMax
+    || rooms.join()!==FILTER.rooms.join()
+    || Object.entries(fOpt).some(([k,id]) => optVal(id) !== (FILTER[k] ?? null));
+  const b = document.getElementById('fApply'); b.disabled = !dirty; b.classList.toggle('dirty', dirty);
+}
+document.querySelector('.fcond').addEventListener('input', markFilterDirty);
+document.querySelector('.fcond').addEventListener('change', markFilterDirty);
+document.querySelectorAll('.fcond input').forEach(i => i.addEventListener('keydown', e => { if (e.key==='Enter' && !document.getElementById('fApply').disabled) document.getElementById('fApply').click(); }));
+const roomText = () => FILTER.rooms.length ? `, 방 ${FILTER.rooms.map(r => r===4 ? '4개 이상' : r+'개').join('·')}` : '';
+const rangeText = (lo, hi, unit) => lo != null && hi != null ? `${num(lo)}~${num(hi)}${unit}` : lo != null ? `${num(lo)}${unit} 이상` : `${num(hi)}${unit} 이하`;
+const unitText = () => [FILTER.hhMin != null || FILTER.hhMax != null ? '세대수 ' + rangeText(FILTER.hhMin, FILTER.hhMax, '세대') : '',
+                        FILTER.ageMin != null ? `${num(FILTER.ageMin)}년차 이상` : '']
+                       .filter(Boolean).map(t => ', ' + t).join('');
+const filterText = () => `공급 ${FILTER.areaMin}평 이상 ${FILTER.areaMax}평 미만, ${FILTER.priceMin>0?FILTER.priceMin+'억 이상 ':''}${FILTER.priceMax}억 이하${roomText()}${unitText()}`;
+
+/* 단지별 지표: 보기 범위(필터 조건/평형만/전체)마다 계산
+   거래의 가격 조건은 '단지·전용면적' 단위로 판단(최근 6개월 실거래 중앙값, 없으면 현재 호가 중앙값)해서
+   가격이 올라 조건에서 빠지는 착시를 막음. 매물은 각 매물의 현재 호가로 판단. */
+function computeMetrics(){
+  const n = D.months.length, cur = n - 1;
+  const in6 = i => i >= n - 7 && i < cur, in3 = i => i >= n - 4 && i < cur, prev6 = i => i >= n - 13 && i < n - 7;
+  const aMin = FILTER.areaMin*PY, aMax = FILTER.areaMax*PY, pMin = FILTER.priceMin*1e4, pMax = FILTER.priceMax*1e4;   // 만원
+  const areaOK = sup => sup >= aMin && sup < aMax, priceOK = p => p >= pMin && p <= pMax;
+  D.units.forEach(u => {
+    const segP = {}, segL = {};
+    u.tr.forEach(([i, amt, ex]) => { if (in6(i)) (segP[Math.round(ex)] = segP[Math.round(ex)] || []).push(amt); });
+    u.ar.forEach(([p, sup, ex]) => { if (ex) (segL[Math.round(ex)] = segL[Math.round(ex)] || []).push(p); });
+    const segOK = ex => { const k = Math.round(ex), v = segP[k] ? med(segP[k]) : segL[k] ? med(segL[k]) : null; return v != null && priceOK(v); };
+    const uOK = unitOK(u);                                  // 단지 조건(세대수·년차)은 '필터 조건' 보기에만 적용
+    u.trIn = {filt:[], area:[], all:[]};
+    u.tr.forEach(t => { const [i, amt, ex, sup] = t, a = areaOK(sup) && roomOK(t[6]);
+      u.trIn.all.push(t); if (a) u.trIn.area.push(t); if (a && uOK && segOK(ex)) u.trIn.filt.push(t); });
+    u.m = {};
+    u.match = false;
+    SCOPES.forEach(sc => {
+      const arts = u.ar.filter(x => sc==='all' || (areaOK(x[1]) && roomOK(x[7]) && (sc==='area' || (uOK && priceOK(x[0])))));
+      const trs = u.trIn[sc];
+      const hh = sc==='filt' && !uOK ? 0 : u.py.filter(x => sc==='all' || (areaOK(x[0]) && roomOK(x[4]))).reduce((a, x) => a + (x[2]||0), 0);
+      const lp = arts.map(([p, sup]) => p/(sup/PY)), tp = trs.filter(t => in6(t[0])).map(t => t[1]/(t[3]/PY));
+      const L = med(lp), T = med(tp);
+      u.m[sc] = {households:hh, listings:arts.length, trades3:trs.filter(t => in3(t[0])).length,
+        listPpp:L, tradePpp:T, gap: L && T ? +((L/T-1)*100).toFixed(1) : null,
+        days:arts.map(x=>x[3]).filter(v=>v!=null), realtors:arts.map(x=>x[4]||1),
+        listRange: arts.length ? [Math.min(...arts.map(x=>x[0])), Math.max(...arts.map(x=>x[0]))] : null,
+        unkRoomL: arts.filter(x => x[7] == null).length};
+      const now6 = trs.filter(t => in6(t[0])).length, bef6 = trs.filter(t => prev6(t[0])).length;
+      Object.assign(u.m[sc], {now6, bef6, trend: now6 > bef6 ? 'up' : now6 < bef6 ? 'down' : 'flat'});
+    });
+    u.match = u.m.filt.listings > 0 || u.trIn.filt.some(t => t[0] >= n - 13);
+  });
+}
+
+/* ---------- 집계 ---------- */
+let STATS = {}, SERIES = {};
+function agg(group, sc){
+  const c = (k, s=sc) => group.reduce((a,u)=>a+(u.m[s][k]||0),0);
+  const hh = c('households'), ls = c('listings'), t3 = c('trades3');
+  const days = group.flatMap(u=>u.m[sc].days), rl = group.flatMap(u=>u.m[sc].realtors);
+  const gaps = group.map(u=>u.m[sc].gap).filter(v=>v!=null), lp = group.map(u=>u.m[sc].listPpp).filter(Boolean);
+  return {units:group.length, households:hh, listings:ls, listingsAll:c('listings','all'), trades3:t3, trades3All:c('trades3','all'),
+    absorb: ls ? +(t3/3/ls*100).toFixed(1) : null, listingRate: hh ? +(ls/hh*100).toFixed(2) : null,
+    listPpp: lp.length ? Math.round(med(lp)) : null, gap: gaps.length ? +med(gaps).toFixed(1) : null,
+    days: days.length ? Math.round(med(days)) : null, realtors: rl.length ? +(rl.reduce((a,b)=>a+b,0)/rl.length).toFixed(1) : null};
+}
+function computeStats(){
+  const dongs = [...D.dongs, '전체'], n = D.months.length;
+  STATS = {}; SERIES = {};
+  SCOPES.forEach(sc => { STATS[sc] = {}; SERIES[sc] = {}; });
+  dongs.forEach(d => {
+    const grp = D.units.filter(u => d==='전체' || u.dong===d);
+    SCOPES.forEach(sc => {
+      STATS[sc][d] = {all:agg(grp, sc), noCoord: grp.filter(u=>u.grade==null).length};
+      ['상','중','하'].forEach(g => STATS[sc][d][g] = agg(grp.filter(u=>u.grade===g), sc));
+      SERIES[sc][d] = {};
+      ['상','중','하','all'].forEach(g => {
+        const cnt = Array(n).fill(0), pp = Array.from({length:n}, () => []);
+        grp.forEach(u => { if (g!=='all' && u.grade!==g) return;
+          u.trIn[sc].forEach(t => { cnt[t[0]]++; pp[t[0]].push(t[1]/(t[3]/PY)); }); });
+        SERIES[sc][d][g] = {count:cnt, ppp:pp.map(a => a.length ? Math.round(med(a)) : null)};
+      });
+    });
+  });
+}
+
+/* ---------- 지도 ---------- */
+document.getElementById('cond').textContent =
+  `${D.date} 기준. 추이는 국토부 실거래(해제 제외, 계약월 기준), 현재 매물은 네이버, 기준선은 한국부동산원. `+
+  `5개 동 전체를 수집한 뒤 필터를 적용합니다. 거래의 가격 조건은 단지·평형별 최근 6개월 실거래 중앙값(없으면 현재 호가)으로 판단합니다. `+
+  `세대수·년차는 단지 조건이라 '필터 조건' 보기에만 적용합니다. 방 수·세대수 정보가 없는 거래·매물·단지는 조건으로 거르지 않고 포함하며, 몇 건인지 '확인' 줄에 표시합니다. 최근 ${D.provisional}개월은 신고 지연으로 잠정(점선)입니다.`;
+const map = L.map('map', {zoomSnap:.5});
+/* ---------- 모바일 바텀시트 ---------- */
+const mq = window.matchMedia('(max-width:900px)');
+const isMobile = () => mq.matches;
+const panelEl = document.getElementById('panel'), wrapEl = document.querySelector('.wrap');
+const SHEET = {peek:.2, half:.5, full:1};
+let sheetState = mq.matches ? 'peek' : 'half';        // 모바일 첫 화면은 요약의 '전체 거래' 줄까지만
+const sheetPx = () => isMobile() ? panelEl.getBoundingClientRect().height : 0;
+function setSheet(st){
+  if (!isMobile()) { document.documentElement.style.removeProperty('--sheet-px'); return; }
+  sheetState = st;
+  let h = st==='full' ? wrapEl.clientHeight - 8 : Math.max(118, wrapEl.clientHeight * SHEET[st]);
+  if (st==='peek') {                                  // 내린 상태: 요약 제목 + '전체 거래' 줄이 딱 보이는 높이
+    const line = !state.unit && document.querySelector('#view .lead .lx-line');
+    if (line) { panelEl.scrollTop = 0;
+      const need = line.getBoundingClientRect().bottom - panelEl.getBoundingClientRect().top + 8;
+      if (need > 90 && need < wrapEl.clientHeight * .5) h = need; }
+  }
+  panelEl.style.setProperty('--sheet-h', h + 'px');
+  document.documentElement.style.setProperty('--sheet-px', (st==='full' ? 0 : h) + 'px');
+  document.getElementById('sheetHint').textContent = st==='peek' ? '끌어올려 자세히 보기' : st==='half' ? '위로 끌면 전체 화면' : '아래로 끌어 지도 보기';
+  if (st==='peek') panelEl.scrollTop = 0;
+}
+(() => {   // 손잡이: 누르면 단계 전환, 끌면 높이 조절 후 가까운 단계로
+  const hd = document.getElementById('sheetHandle');
+  let y0 = 0, h0 = 0, moved = false;
+  hd.addEventListener('pointerdown', e => { if (!isMobile()) return; y0 = e.clientY; h0 = panelEl.getBoundingClientRect().height; moved = false;
+    panelEl.classList.add('dragging'); hd.setPointerCapture(e.pointerId); });
+  hd.addEventListener('pointermove', e => { if (!panelEl.classList.contains('dragging')) return;
+    const h = Math.min(wrapEl.clientHeight - 8, Math.max(90, h0 + (y0 - e.clientY)));
+    if (Math.abs(y0 - e.clientY) > 4) moved = true;
+    panelEl.style.setProperty('--sheet-h', h + 'px'); });
+  const end = () => { if (!panelEl.classList.contains('dragging')) return;
+    panelEl.classList.remove('dragging');
+    const r = panelEl.getBoundingClientRect().height / wrapEl.clientHeight;
+    if (!moved) setSheet(sheetState==='peek' ? 'half' : sheetState==='half' ? 'full' : 'peek');
+    else setSheet(r < .33 ? 'peek' : r < .75 ? 'half' : 'full'); };
+  hd.addEventListener('pointerup', end); hd.addEventListener('pointercancel', end);
+})();
+document.getElementById('infoBtn').onclick = () => { const h = document.getElementById('hdr'), o = h.classList.toggle('open');
+  document.getElementById('infoBtn').setAttribute('aria-expanded', o); setTimeout(() => { map.invalidateSize(); setSheet(sheetState); }, 50); };
+// 시트에 가려지지 않는 위쪽 영역 기준으로 지도 이동
+function flyVisible(latlng, zoom){
+  const off = sheetState==='full' ? 0 : sheetPx() / 2;
+  if (!off) return map.flyTo(latlng, zoom, {duration:.5});
+  map.flyTo(map.unproject(map.project(latlng, zoom).add([0, off]), zoom), zoom, {duration:.5});
+}
+const fitVisible = b => map.flyToBounds(b, {duration:.6, paddingTopLeft:[10,10], paddingBottomRight:[10, sheetState==='full' ? 10 : sheetPx() + 10]});
+map.createPane('lines').style.zIndex = 420;
+map.createPane('fac').style.zIndex = 440;
+map.createPane('units').style.zIndex = 460;
+map.createPane('meas').style.zIndex = 480;            // 거리 재기 선·점 (단지 위)
+const isHttp = location.protocol.startsWith('http');
+const vwt = (layer, ext) => L.tileLayer(`https://api.vworld.kr/req/wmts/1.0.0/${D.vworldKey}/${layer}/{z}/{y}/{x}.${ext}`,
+  {attribution:'&copy; 국토교통부 브이월드', minZoom:6, maxNativeZoom:layer==='Satellite'?19:18, maxZoom:19, className:'basemap'});
+const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'&copy; OpenStreetMap', maxZoom:19, className:'basemap'});
+const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+  {attribution:'Tiles &copy; Esri', maxNativeZoom:13, maxZoom:19, className:'basemap'});
+const chain = [], bases = {};
+if (D.vworldKey) chain.push(['브이월드 백지도', vwt('white','png')]);
+if (isHttp) chain.push(['OpenStreetMap', osm]);
+chain.push(['Esri (줌 13 이상은 흐림)', esri]);
+chain.forEach(([n,l]) => bases[n] = l);
+if (D.vworldKey) { bases['브이월드 일반지도'] = vwt('Base','png'); bases['브이월드 위성'] = vwt('Satellite','jpeg'); }
+const notes = [];
+if (!D.vworldKey) notes.push('브이월드 키 없음 (.env 의 VWORLD_KEY)');
+if (!isHttp) notes.push('파일로 직접 열어 OSM 사용 불가');
+const statusCtl = L.control({position:'bottomright'});
+statusCtl.onAdd = () => L.DomUtil.create('div','legend basemap-status'); statusCtl.addTo(map);
+// 축척: 기본 축척은 1·2·3·5 단위로만 끊어서 확대 단계에 따라 막대 길이만 달라짐 → 50m·250m 같은 단위도 쓰도록 세분
+const scaleCtl = L.control.scale({position:'bottomright', imperial:false, maxWidth:120});
+scaleCtl._getRoundNum = num => {
+  const p = Math.pow(10, Math.floor(Math.log10(num))), d = num / p;
+  return [1, 1.5, 2, 2.5, 3, 4, 5, 7.5].filter(x => x <= d).pop() * p;     // 예: 50·75·100·150·200·250·300·400·500m
+};
+scaleCtl.addTo(map);
+const setStatus = name => { document.querySelector('.basemap-status').innerHTML =
+  `<b>배경지도</b> ${esc(name)}${notes.length ? '<br><span style="color:#b5446e">' + notes.map(esc).join('<br>') + '</span>' : ''}`; };
+let cur = -1;
+chain.forEach(([name, layer], i) => { let ok = 0, err = 0;
+  layer.on('tileload', () => ok++);
+  layer.on('tileerror', () => { if (++err >= 8 && ok === 0 && cur === i && i < chain.length - 1) { notes.push(`${name} 타일 실패`); activate(i + 1); } }); });
+function activate(i){ if (cur >= 0) map.removeLayer(chain[cur][1]); cur = i; chain[i][1].addTo(map); setStatus(chain[i][0]); }
+activate(0);
+map.on('baselayerchange', e => setStatus(e.name));
+map.getContainer().classList.add('dim');
+const dimCtl = L.control({position:'topleft'});
+dimCtl.onAdd = () => { const b = L.DomUtil.create('button','dim-btn');
+  const label = () => b.textContent = map.getContainer().classList.contains('dim') ? '배경 흐림 켜짐' : '배경 원래대로';
+  label(); L.DomEvent.disableClickPropagation(b);
+  b.onclick = () => { map.getContainer().classList.toggle('dim'); label(); }; return b; };
+dimCtl.addTo(map);
+const zoomClass = () => { const z = map.getZoom(), c = map.getContainer().classList; c.toggle('z-lo', z < 14); c.toggle('z-mid', z < 16); };
+map.on('zoomend', zoomClass);
+
+const dongLayers = {}, allBounds = L.latLngBounds([]);
+if (D.boundaries && D.boundaries.features.length) {
+  L.geoJSON(D.boundaries, {
+    style: f => ({color:DONG_COLORS[f.properties.name]||'#555', weight:2.5, fillColor:DONG_COLORS[f.properties.name], fillOpacity:.04}),
+    onEachFeature: (f, layer) => { const n = f.properties.name; dongLayers[n] = layer;
+      layer.bindTooltip(n,{permanent:true,direction:'center',className:'dl'});
+      layer.on('click', () => { if (!adding) select(n); }); allBounds.extend(layer.getBounds()); }
+  }).addTo(map);
+}
+const railLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map);
+const elemLayer = L.layerGroup().addTo(map), midLayer = L.layerGroup().addTo(map), highLayer = L.layerGroup().addTo(map);
+const rangeLayer = L.layerGroup().addTo(map), unitLayer = L.layerGroup().addTo(map);
+(D.tracks||[]).forEach(t => L.polyline(t, {pane:'lines', color:RAIL, weight:3, opacity:.75}).addTo(railLayer));
+
+/* 동을 고르면 그 동만 보이게: 다른 동 단지 숨김, 경계 흐리게, 시설은 그 동 주변만 */
+const focusBounds = () => state.dong!=='전체' && dongLayers[state.dong] ? dongLayers[state.dong].getBounds().pad(.12) : null;
+const inFocus = p => { const b = focusBounds(); return !b || b.contains([p.lat, p.lng]); };
+function focusDongs(){
+  Object.entries(dongLayers).forEach(([n, layer]) => {
+    const on = state.dong==='전체' || n===state.dong;
+    layer.setStyle({opacity: on ? 1 : .25, weight: on ? (state.dong==='전체' ? 2.5 : 3.5) : 1.5,
+                    fillOpacity: on ? (state.dong==='전체' ? .04 : .07) : 0});
+    const t = layer.getTooltip && layer.getTooltip(), el = t && t.getElement && t.getElement();
+    if (el) el.style.opacity = on ? 1 : .3;
+  });
+}
+/* 시설을 누르면 그 시설의 도보권(기준거리) 원과 안에 드는 단지 수를 표시 */
+function showRange(k, p, popup){
+  rangeLayer.clearLayers();
+  const R = CFG.walk[k], color = k==='station' ? RAIL : k==='high' ? '#3fae6a' : SCHOOL[k].c;
+  L.circle([p.lat,p.lng], {pane:'lines', radius:R, color, weight:2, dashArray:'6 4', fillColor:color, fillOpacity:.08, interactive:false}).addTo(rangeLayer);
+  const inside = D.units.filter(u => u.lat!=null && dist(u, p) <= R);
+  inside.forEach(u => L.circleMarker([u.lat,u.lng], {pane:'lines', radius:4, color, weight:0, fillOpacity:0, interactive:false}).addTo(rangeLayer));
+  const html = `<div class="fp-stat"><span>도보권 ${R}m 안 단지</span><b>${inside.length}개</b></div>`
+    + (inside.length ? `<div class="fp-chips">${inside.sort((a,b)=>dist(a,p)-dist(b,p)).slice(0,4).map(u => `<button class="fp-chip" data-act="unit-open" data-id="${u.id}" title="${esc(u.name)}">${esc(u.name.replace(/\(네이버\)$/,''))}</button>`).join('')}${inside.length>4?`<span class="fp-more">외 ${inside.length-4}개</span>`:''}</div>` : '');
+  // 내용을 바꾼 뒤 팝업 크기·화면 이동을 다시 계산
+  popup.setContent(facPopup(k, p, html));
+  if (popup._adjustPan) setTimeout(() => popup._adjustPan(), 0);
+}
+const clearRange = () => rangeLayer.clearLayers();
+function facPopup(k, p, rangeHtml=''){
+  return `<div class="fp">
+    <div class="fp-head">${k==='station' ? `<span class="fp-ico station">${KLABEL[k]}</span>` : `<span class="fp-ico school">${schoolSvg(k, 32, p.custom)}</span>`}
+      <div class="fp-titles"><div class="fp-name">${esc(k==='station' ? p.name+'역' : p.name)}</div>
+        <div class="fp-kind">${KNAME[k]}${p.custom?' · 직접 추가':''}${(p.lines||[]).length?' · '+p.lines.map(esc).join(', '):''}</div></div></div>
+    <div class="fac-range">${rangeHtml}</div>
+    <div class="fp-actions">
+      <button class="fp-btn" data-act="${p.custom?'del':'exclude'}" data-kind="${k}" data-name="${esc(p.name)}">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="${p.custom
+          ? 'M3 4h10M6.5 4V2.8h3V4M5 4l.6 9h4.8L11 4' : 'M8 1.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 8 1.8zM3.6 3.6l8.8 8.8'}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${p.custom ? '추가한 시설 삭제' : '이 시설 제외'}</button>
+    </div></div>`;
+}
+function orderAlongLine(pts){
+  if (pts.length < 3) return pts;
+  const mx = pts.reduce((a,p)=>a+p.lng,0)/pts.length, my = pts.reduce((a,p)=>a+p.lat,0)/pts.length;
+  let sxx=0, syy=0, sxy=0; pts.forEach(p=>{ const dx=p.lng-mx, dy=p.lat-my; sxx+=dx*dx; syy+=dy*dy; sxy+=dx*dy; });
+  const th = .5*Math.atan2(2*sxy, sxx-syy), ux = Math.cos(th), uy = Math.sin(th);
+  return [...pts].sort((a,b)=>((a.lng-mx)*ux+(a.lat-my)*uy)-((b.lng-mx)*ux+(b.lat-my)*uy));
+}
+function drawFacilities(){
+  [stLayer, elemLayer, midLayer, highLayer, rangeLayer].forEach(l => l.clearLayers());
+  if (!(D.tracks||[]).length) {             // 선로 데이터가 없으면 같은 노선 역을 직선 근사
+    railLayer.clearLayers(); const byLine = {};
+    FAC.station.forEach(s => (s.lines||[]).forEach(l => (byLine[l] = byLine[l] || []).push(s)));
+    Object.values(byLine).forEach(pts => pts.length > 1 && L.polyline(orderAlongLine(pts).map(p=>[p.lat,p.lng]),
+      {pane:'lines', color:RAIL, weight:3, opacity:.75}).addTo(railLayer));
+  }
+  FAC.station.filter(inFocus).forEach(s => {
+    L.circleMarker([s.lat,s.lng], {pane:'fac', radius:4.5, color:RAIL, weight:2, fillColor:s.custom?'#ffe4e6':'#fff', fillOpacity:1})
+      .bindTooltip(`${esc(s.name)}역`, {permanent:true, direction:'right', offset:[6,0], className:'st'})
+      .bindPopup(facPopup('station', s), {minWidth:250, maxWidth:320, className:'fac-popup', autoPanPaddingTopLeft:[60,70], autoPanPaddingBottomRight:[60,140]}).on('popupopen', e => showRange('station', s, e.popup)).on('popupclose', clearRange).addTo(stLayer);
+  });
+  [['elementary',elemLayer],['middle',midLayer],['high',highLayer]].forEach(([k, layer]) => FAC[k].filter(inFocus).forEach(p =>
+    L.marker([p.lat,p.lng], {pane:'fac', icon:schoolIcon(k, p.custom), keyboard:false, riseOnHover:true})
+      .bindTooltip(esc(p.name)+(p.custom?' (추가)':''), {direction:'top'}).bindPopup(facPopup(k, p), {minWidth:250, maxWidth:320, className:'fac-popup', autoPanPaddingTopLeft:[60,70], autoPanPaddingBottomRight:[60,140]})
+      .on('popupopen', e => showRange(k, p, e.popup)).on('popupclose', clearRange).addTo(layer)));
+}
+const markers = {};
+const ARROW = {up:'▲', down:'▼', flat:'–'};
+const pyCounts = trs => { const c = {}; trs.forEach(t => { const k = Math.round(t[3]/PY); c[k] = (c[k]||0) + 1; });
+  return Object.entries(c).map(([k, v]) => [+k, v]).sort((a, b) => a[0] - b[0]); };
+const pyLabel = sup => Math.round(sup/PY) + '평';
+const fmtDate = d => d ? d.slice(2).replace(/-/g,'.') : '–';
+const inFilterArea = sup => sup >= FILTER.areaMin*PY && sup < FILTER.areaMax*PY;
+const inFilterPrice = p => p >= FILTER.priceMin*1e4 && p <= FILTER.priceMax*1e4;   // 만원
+/* 단지 마커: 크기 = 최근 6개월 거래 건수(보기 범위 기준), 원 안 글자 = 접근 등급(우·보·미),
+   오른쪽 아래 배지 = 필터 조건 매물 수, 오른쪽 위 화살표 = 거래 추이(증가 녹색 ▲ 위로, 감소 빨강 ▼ 아래로) */
+const UP = '#16a34a', DOWN = '#d7263d';
+const GRADE_LETTER = {'상':'우', '중':'보', '하':'미'};
+/* 재건축 특별정비구역: 1차 선정(보라) · 2차 선정(파랑) · 탈락(빨강, 가장 눈에 띄게) */
+const RZ_KEY = u => !u.rz ? null : u.rz.s === '선정' ? 'rz' + u.rz.r : 'rzx';
+const RZ_STYLE = {rz1:{c:'#6d28d9', t:'1차', long:'1차 선도지구'}, rz2:{c:'#1f4fb8', t:'2차', long:'2차 특별정비구역'}, rzx:{c:'#e11d48', t:'탈락', long:'특별정비구역 탈락'}};
+function rzPill(u, full=false){
+  const k = RZ_KEY(u); if (!k) return '';
+  const S = RZ_STYLE[k], z = u.rz;
+  const txt = full ? `${S.long} · ${z.z}${z.d ? ` (${z.d.slice(0,7).replace('-','.')})` : ''}${z.note ? ` · ${z.note}` : ''}${k==='rzx' ? ' · 3차 재도전 후보' : ''}`
+                   : S.t;
+  return `<span class="rz-pill ${k}" title="${esc(`${S.long} · ${z.z}${z.note ? ' · ' + z.note : ''}`)}">${esc(txt)}</span>`;
+}
+// 24×34 좌표의 화살표: 꺾쇠 2개 + 테두리 화살표 몸통. 아래 방향은 180° 회전
+const ARROW_SHAPES = `<polyline class="ch1" points="4,8 12,1.5 20,8"/><polyline class="ch2" points="4,14.5 12,8 20,14.5"/>
+  <path class="body" d="M12 14.5 L21 23.5 H16 V32.5 H8 V23.5 H3 Z"/>`;
+function trendArrow(dir, x, y, sc){
+  const id = dir==='up' ? 'gUp' : 'gDn';
+  const defs = dir==='up'
+    ? `<linearGradient id="gUp" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="34"><stop offset="0" stop-color="#a3f0a0"/><stop offset="1" stop-color="#0db48a"/></linearGradient>`
+    : `<linearGradient id="gDn" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="34"><stop offset="0" stop-color="#fca5a5"/><stop offset="1" stop-color="#d7263d"/></linearGradient>`;
+  const tf = dir==='up' ? `translate(${x},${y}) scale(${sc})` : `translate(${x + 24*sc},${y + 34*sc}) rotate(180) scale(${sc})`;
+  return `<defs>${defs}</defs><g transform="${tf}"><g class="arw" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#fff" stroke-width="6" opacity=".9">${ARROW_SHAPES}</g>
+    <g stroke="url(#${id})" stroke-width="3.2">${ARROW_SHAPES}</g></g></g>`;
+}
+const unitRadius = u => Math.max(9, 5 + Math.min(16, Math.sqrt(u.m[state.scope].now6) * 4));   // 글자가 들어갈 최소 크기 보장
+function rzBadge(u, c, r){
+  const k = RZ_KEY(u); if (!k || HIDE[k]) return '';
+  const S = RZ_STYLE[k], big = k === 'rzx', w = big ? 30 : 22, h = big ? 16 : 14, x = c - r*.72 - w + 6, y = c - r*.72 - h + 5;
+  return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${S.c}" stroke="#fff" stroke-width="1.5"/>
+    <text x="${x + w/2}" y="${y + h/2 + .5}" text-anchor="middle" dominant-baseline="central" font-size="${big ? 10 : 9}" font-weight="800" fill="#fff"
+    font-family="IBM Plex Sans KR,sans-serif">${S.t}</text></g>`;
+}
+function unitIcon(u, r){
+  const T = u.m[state.scope], nL = u.m.filt.listings;   // L 은 Leaflet 이라 다른 이름 사용
+  const pad = 24, size = 2*(r+pad), c = size/2;
+  const gl = GRADE_LETTER[u.grade];
+  const letter = gl ? `<text x="${c}" y="${c+.5}" text-anchor="middle" dominant-baseline="central" font-size="${Math.max(10, Math.min(15, r*.95))}"
+      font-weight="700" fill="#fff" font-family="IBM Plex Sans KR,sans-serif">${gl}</text>` : '';
+  const bw = 8 + String(nL).length * 6.5, bx = c + r*.55, by = c + r*.45;
+  const badge = nL ? `<g><rect x="${bx}" y="${by}" width="${bw}" height="14" rx="7" fill="#fff" stroke="#2453c4" stroke-width="1.3"/>
+      <text x="${bx + bw/2}" y="${by + 7.5}" text-anchor="middle" dominant-baseline="central" font-size="9.5" font-weight="700" fill="#2453c4"
+      font-family="IBM Plex Sans KR,sans-serif">${nL}</text></g>` : '';
+  const sc = Math.max(.62, Math.min(.82, r / 20));                 // 높이 약 21~28px
+  const ar = T.trend==='flat' ? '' : trendArrow(T.trend, c + r*.45, c - r*.4 - 34*sc*.85, sc);
+  const svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" overflow="visible" aria-hidden="true">`
+    + `<circle cx="${c}" cy="${c}" r="${r}" fill="${GRADE_COLORS[u.grade]||'#c7cdd4'}" fill-opacity=".92" stroke="#fff" stroke-width="1.2"/>`
+    + letter + badge + ar + rzBadge(u, c, r) + '</svg>';
+  return L.divIcon({html:svg, className:'unit-ico', iconSize:[size,size], iconAnchor:[c,c], popupAnchor:[0,-r]});
+}
+const ageText = u => [u.households ? num(u.households)+'세대' : null, u.age ? `${u.age}년차 (${u.built})` : null].filter(Boolean).join(' · ');
+const trendText = T => `${ARROW[T.trend]} 최근 6개월 ${T.now6}건 / 직전 6개월 ${T.bef6}건`;
+/* 아파트 정보 카드: 지도 팝업과 오른쪽 상세 상단에서 같이 사용 */
+const GRADE_WORD = {'상':'우수','중':'보통','하':'미흡'};
+const FAC_KIND = {station:'지하철', elementary:'초등학교', middle:'중학교', high:'고등학교'};
+const fmtDot = d => d ? d.replace(/-/g,'.') : '–';
+function unitCard(u, {cta=true, close=false, open=false} = {}){
+  const F = u.m.filt, A = u.m.all, T = u.m[state.scope];
+  const fac = KINDS.filter(k => u.near[k]).map(k => ({k, name:u.near[k][0], d:u.near[k][1], ok:u.near[k][1] <= CFG.walk[k]}))
+                   .sort((a,b) => a.d - b.d);
+  const facRows = fac.map(f => `<div class="ac-fac">
+      <span class="ac-chk ${f.k==='station'?'st':''} ${f.ok?'':'off'}">${f.ok ? (f.k==='station'?'▣':'✓') : '·'}</span>
+      <span class="ac-kind">${FAC_KIND[f.k]}</span><span class="ac-fname">${esc(f.k==='station' ? f.name+'역' : f.name)}</span>
+      <span class="ac-dist ${f.ok?(f.k==='station'?'st':'ok'):''}">${m(f.d)}</span></div>`).join('')
+    || '<p class="ac-empty">역·학교 데이터가 없어 접근성을 계산하지 못했습니다.</p>';
+  const tw = T.trend==='up' ? '증가' : T.trend==='down' ? '감소' : '유지';
+  const last = [...u.tr].sort((a,b) => (b[4]||'').localeCompare(a[4]||'')).slice(0,3);
+  const sales = last.length ? `<table class="ac-sales"><thead><tr><th>계약일</th><th>평형 · 구조</th><th>층</th><th>거래가</th></tr></thead><tbody>${
+      last.map(t => `<tr><td class="d">${fmtDot(t[4])}</td><td>${pyLabel(t[3])}${t[6]!=null?' · '+t[6]+'룸':''}</td><td>${t[5]!=null?t[5]+'층':'–'}</td><td>${won(t[1]*1e4)}</td></tr>`).join('')
+    }</tbody></table>` : '<p class="ac-empty">최근 실거래가 없습니다.</p>';
+  return `<article class="acard">
+    ${close ? '<button class="ac-close" data-act="card-close" aria-label="닫기">×</button>' : ''}
+    <h3 class="ac-title">${esc(u.name)} · ${esc(u.dong)}</h3>
+    <div class="ac-sub">${[u.households?num(u.households)+'세대':null, u.age?`${u.age}년차 (${u.built})`:null, u.type].filter(Boolean).map(esc).join(' · ') || '&nbsp;'}</div>
+    ${u.rz ? `<div class="ac-rz">${rzPill(u, true)}</div>` : ''}
+    <div class="ac-summary">
+      <div class="ac-metric"><div class="ac-ico">▦</div><div><div class="ac-ml">세대</div><div class="ac-mv">${u.households?num(u.households):'–'}</div></div></div>
+      <div class="ac-metric"><div class="ac-ico">▣</div><div><div class="ac-ml">준공</div><div class="ac-mv">${u.built?u.built+'년':'–'}</div></div></div>
+      <div class="ac-metric"><div class="ac-ico">▥</div><div><div class="ac-ml">접근성</div><div class="ac-mv">${u.score==null?'–':u.score+'점'} <small class="g-${u.grade||''}">${GRADE_WORD[u.grade]||''}</small></div></div></div>
+    </div>
+    <section class="ac-sec"><h4>주변 시설 <span>거리순 · ✓ 도보권</span></h4>${facRows}</section>
+    <details class="ac-sec ac-x"${open?' open':''}><summary><h4>거래 추이</h4>
+        <span class="ac-peek"><b class="${T.trend}">${T.trend==='up'?'▲':T.trend==='down'?'▼':'–'} ${T.now6}건</b> / 직전 ${T.bef6}건 · 매물 ${F.listings}건</span><i class="ac-caret" aria-hidden="true"></i></summary>
+      <div class="ac-xbody"><div class="ac-basis">${SCOPE_NAME[state.scope]} 기준</div>
+      <div class="ac-compare">
+        <div class="ac-box ${T.trend}"><div class="ac-period">최근 6개월</div><div class="ac-count">${T.now6}건</div></div>
+        <div class="ac-trend ${T.trend}"><span>${T.trend==='up'?'▲':T.trend==='down'?'▼':'–'}</span>${tw}</div>
+        <div class="ac-box prev"><div class="ac-period">직전 6개월</div><div class="ac-count">${T.bef6}건</div></div>
+      </div>
+      ${pyTrendTable(u)}
+      <div class="ac-stats">
+        <div class="ac-row"><span>매물 전체</span><b>${A.listings}건</b><span>필터 결과</span><b class="hl">${F.listings}건</b></div>
+        <div class="ac-row"><span>최근 3개월 거래</span><b>${A.trades3}건</b><span>필터 결과</span><b class="hl">${F.trades3}건</b></div>
+        <div class="ac-row"><span>필터 호가</span><b>${F.listRange?won(F.listRange[0]*1e4)+'~'+won(F.listRange[1]*1e4):'–'}</b><span>호가 괴리</span><b class="${F.gap>0?'down':''}">${pct(F.gap)}</b></div>
+      </div>
+      <div class="ac-filter">적용 필터 <span class="ac-chip">${esc(filterText())}</span></div>
+    </div></details>
+    <details class="ac-sec ac-x"${open?' open':''}><summary><h4>최근 실거래</h4>
+        <span class="ac-peek">${last.length ? `${fmtDate(last[0][4])} · <b>${won(last[0][1]*1e4)}</b>` : '거래 없음'}</span><i class="ac-caret" aria-hidden="true"></i></summary>
+      <div class="ac-xbody">${sales}</div></details>
+    ${cta ? `<button class="ac-cta" data-act="unit-detail" data-id="${u.id}">평형별 시세 · 거래 내역 보기 →</button>` : ''}
+  </article>`;
+}
+// 팝업이 열려 있는 동안은 범례·배경지도 표시가 팝업을 가리지 않도록 뒤로 보냄
+map.on('popupopen', () => map.getContainer().classList.add('pop-open'));
+map.on('popupclose', () => map.getContainer().classList.remove('pop-open'));
+document.addEventListener('toggle', e => {
+  // 팝업 안에서는 하나를 펼치면 다른 하나는 접어서 팝업이 화면을 넘지 않게 (오른쪽 상세는 둘 다 펼침 가능)
+  if (e.target.open && e.target.classList && e.target.classList.contains('ac-x') && e.target.closest('.leaflet-popup, #unitDock'))
+    e.target.parentElement.querySelectorAll('details.ac-x[open]').forEach(d => { if (d !== e.target) d.open = false; });
+  const pop = e.target.closest && e.target.closest('.leaflet-popup') && map._popup;
+  if (pop && pop._updateLayout) { pop._updateLayout(); pop._updatePosition(); if (pop._adjustPan) pop._adjustPan(); }
+}, true);
+/* 평형별 거래 추이: 최근 6개월 vs 직전 6개월 (보기 범위 기준) */
+function pyTrendTable(u){
+  const n = D.months.length, in6 = i => i >= n - 7 && i < n - 1, prev6 = i => i >= n - 13 && i < n - 7;
+  const trs = (u.trIn && u.trIn[state.scope]) || u.tr;
+  const now = Object.fromEntries(pyCounts(trs.filter(t => in6(t[0])))), bef = Object.fromEntries(pyCounts(trs.filter(t => prev6(t[0]))));
+  const keys = [...new Set([...Object.keys(now), ...Object.keys(bef)].map(Number))].sort((a, b) => a - b);
+  if (!keys.length) return '';
+  return `<table class="ac-pyt"><thead><tr><th>평형</th><th>최근 6개월</th><th>직전 6개월</th><th>증감</th></tr></thead><tbody>${
+    keys.map(k => { const a = now[k] || 0, b = bef[k] || 0, d = a - b;
+      return `<tr><td>${k}평</td><td><b>${a}</b></td><td>${b}</td><td class="${d>0?'up':d<0?'down':''}">${d>0?'▲ +'+d:d<0?'▼ '+d:'–'}</td></tr>`; }).join('')
+  }</tbody></table>`;
+}
+function drawUnits(){
+  unitLayer.clearLayers();
+  const vis = D.units.filter(u => u.lat!=null && (state.dong==='전체' || u.dong===state.dong) && shown(u) && !(u.grade && HIDE[u.grade]));
+  // 좌표가 거의 같은 단지(지번을 함께 쓰는 단지 등)는 지도 표시 위치만 둥글게 벌려 놓음 (거리 계산은 원래 좌표)
+  const groups = {};
+  vis.forEach(u => (groups[u.lat.toFixed(4)+','+u.lng.toFixed(4)] ||= []).push(u));
+  const shown_at = {};
+  Object.values(groups).forEach(g => g.forEach((u, i) => {
+    if (g.length < 2) return shown_at[u.id] = [u.lat, u.lng];
+    const a = 2*Math.PI*i/g.length - Math.PI/2, d = 14 + 3*g.length;     // m
+    shown_at[u.id] = [u.lat + d*Math.sin(a)/111320, u.lng + d*Math.cos(a)/(111320*Math.cos(u.lat*Math.PI/180))];
+  }));
+  vis.forEach(u=>{
+    const F = u.m.filt, A = u.m.all, T = u.m[state.scope], r = unitRadius(u);
+    const mk = L.marker(shown_at[u.id], {icon:unitIcon(u, r), pane:'units', keyboard:false, riseOnHover:true});
+    mk._u = u; mk._r = r;
+    mk.on('click', () => pickOrOpen(mk));
+    // PC: 팝업 대신 지도 왼쪽에 붙는 카드(showDock)로 열어서, 펼치고 접어도 지도·점이 움직이지 않게 함
+    mk.bindTooltip(esc(u.name)+(F.listings?` ·${F.listings}`:''), {permanent:true, direction:'top', offset:[0,-r-6], className:'un'});
+    mk.addTo(unitLayer); markers[u.id] = mk;
+    if (!D.boundaries) allBounds.extend(mk.getLatLng());
+  });
+}
+/* 누른 자리에 원이 여러 개 겹쳐 있으면 목록을 띄워 고르게 함 */
+function overlapsOf(mk){
+  const p0 = map.latLngToContainerPoint(mk.getLatLng());
+  return Object.values(markers).filter(o => unitLayer.hasLayer(o)).map(o => {
+    const d = p0.distanceTo(map.latLngToContainerPoint(o.getLatLng()));
+    return {o, d, hit: d < (mk._r + o._r) * .75};
+  }).filter(x => x.hit).sort((a,b) => a.d - b.d).map(x => x.o);
+}
+function openUnit(mk){
+  selectUnit(mk._u.id, false);
+  if (isMobile()) { if (sheetState==='peek') setSheet('half'); }
+}
+/* ---------- PC 단지 카드 (지도 왼쪽 고정) ---------- */
+const dockEl = document.getElementById('unitDock');
+let dockId = null;
+function markSelected(id){
+  document.querySelectorAll('.leaflet-marker-icon.unit-ico.sel').forEach(e => e.classList.remove('sel'));
+  const el = id && markers[id] && markers[id].getElement && markers[id].getElement();
+  if (el) el.classList.add('sel');
+}
+function showDock(u){
+  if (isMobile()) return;
+  dockId = u.id;
+  dockEl.innerHTML = unitCard(u, {cta:true, close:true});
+  dockEl.classList.add('open'); map.getContainer().classList.add('dock-open');
+  map.getContainer().style.setProperty('--dockw', (dockEl.offsetWidth + 20) + 'px');   // 왼쪽 지도 버튼·범례를 카드 옆으로
+  markSelected(u.id);
+  // 카드에 가려지는 자리면 지도를 오른쪽으로 조금만 옮김 (카드를 펼치고 접을 때는 움직이지 않음)
+  const mk = markers[u.id]; if (!mk) return;
+  const pt = map.latLngToContainerPoint(mk.getLatLng()), edge = dockEl.offsetWidth + 40, size = map.getSize();
+  let dx = 0, dy = 0;
+  if (pt.x < edge) dx = pt.x - (edge + 40);
+  else if (pt.x > size.x - 40) dx = pt.x - (size.x - 80);
+  if (pt.y < 40) dy = pt.y - 80; else if (pt.y > size.y - 40) dy = pt.y - (size.y - 80);
+  if (dx || dy) map.panBy([dx, dy], {duration:.35});
+}
+function hideDock(){
+  dockId = null; dockEl.classList.remove('open'); dockEl.innerHTML = '';
+  map.getContainer().classList.remove('dock-open'); markSelected(null);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && dockId && !(typeof MEAS !== 'undefined' && MEAS.on)) hideDock(); });
+function pickOrOpen(mk){
+  const list = overlapsOf(mk);
+  if (list.length < 2) return openUnit(mk);
+  const row = o => { const u = o._u, T = u.m[state.scope];
+    return `<button class="pick-row" data-act="pick-unit" data-id="${u.id}">
+      <span class="pick-dot" style="background:${GRADE_COLORS[u.grade]||'#c7cdd4'}">${GRADE_LETTER[u.grade]||''}</span>
+      <span class="pick-name">${esc(u.name.replace(/\(네이버\)$/,''))} ${rzPill(u)}</span>
+      <span class="pick-meta">${u.age?u.age+'년차 · ':''}<b class="${T.trend}">${T.trend==='up'?'▲':T.trend==='down'?'▼':'–'}${T.now6}</b>${u.m.filt.listings?` · 매물 ${u.m.filt.listings}`:''}</span></button>`; };
+  L.popup({className:'fac-popup', minWidth:240, maxWidth:300, autoPanPaddingTopLeft:[60,70], autoPanPaddingBottomRight:[60,140]})
+    .setLatLng(mk.getLatLng())
+    .setContent(`<div class="fp"><div class="fp-name">이 자리 단지 ${list.length}곳</div><div class="fp-kind">볼 단지를 고르세요</div>
+      <div class="pick-list">${list.map(row).join('')}</div></div>`).openOn(map);
+}
+const layerCtl = L.control.layers(bases, {}, {collapsed:true}).addTo(map);
+function refreshLayerCtl(){
+  [railLayer, stLayer, elemLayer, midLayer, highLayer, unitLayer].forEach(l => layerCtl.removeLayer(l));
+  layerCtl.addOverlay(railLayer, '지하철 노선').addOverlay(stLayer, `지하철역 (${FAC.station.length})`)
+    .addOverlay(elemLayer, `초등학교 (${FAC.elementary.length})`).addOverlay(midLayer, `중학교 (${FAC.middle.length})`)
+    .addOverlay(highLayer, `고등학교 (${FAC.high.length})`).addOverlay(unitLayer, '단지');
+}
+const legend = L.control({position:'bottomleft'});
+legend.onAdd = () => L.DomUtil.create('div','legend'); legend.addTo(map);
+function drawLegend(){
+  const box = document.querySelector('.leaflet-control.legend');
+  if (!box.querySelector('.legend-body')) {
+    box.innerHTML = '<button class="legend-toggle" type="button" aria-expanded="true"><span class="lg-title">범례 · 표시</span><span class="lg-hidden"></span><i aria-hidden="true"></i></button><div class="lg-tg"></div><div class="legend-body"></div>';
+    const btn = box.querySelector('.legend-toggle');
+    const set = open => { box.classList.toggle('collapsed', !open); btn.setAttribute('aria-expanded', open); };
+    set(store.get('legendOpen', !isMobile()));          // PC 는 펼침, 모바일은 접힘으로 시작하고 이후엔 마지막 상태 기억
+    L.DomEvent.disableClickPropagation(box);
+    btn.onclick = () => { const open = box.classList.contains('collapsed'); set(open); store.set('legendOpen', open); };
+  }
+  const el = box.querySelector('.legend-body');
+  el.innerHTML = Object.entries(GRADE_COLORS).map(([g,c])=>`<div><i style="background:${c}"></i>접근 ${GRADE_WORD[g]} (${GRADE_LETTER[g]})</div>`).join('')
+   + `<div style="margin-top:4px"><b>원 크기</b> 최근 6개월 거래 건수</div>`
+   + `<div class="lg-rz">${['rz1','rz2','rzx'].map(k => `<span class="rz-pill ${k}">${RZ_STYLE[k].t}</span>`).join('')} 재건축 1차·2차 선정, 탈락</div>`
+   + `<div><b>원 안 글자</b> 접근 등급 (우수 우 · 보통 보 · 미흡 미)</div>`
+   + `<div><b>파란 숫자</b> 필터 조건 매물 수</div>`
+   + `<div class="lg-arrows"><svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true">${trendArrow('up', 1, 0, .62)}</svg> 거래 증가
+       <svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true">${trendArrow('down', 1, 0, .62)}</svg> 감소</div>`
+   + `<div style="font-size:.72rem;color:var(--sub)">최근 6개월 vs 직전 6개월 (${SCOPE_NAME[state.scope]})</div>`
+   + `<div style="margin-top:4px"><span class="sw" style="background:${RAIL}"></span>지하철</div>`
+   + `<div class="lg-schools">${['elementary','middle','high'].map(k => `<span>${schoolSvg(k, 18)}${KNAME[k]}</span>`).join('')}</div>`
+   + '<div style="font-size:.72rem;color:var(--sub)">역·학교를 누르면 도보권 표시</div>'
+   + (!FAC.station.length || !FAC.elementary.length ? '<div style="color:#b5446e;margin-top:4px">역·학교 데이터 부족:<br>접근성 일부 미산정</div>' : '');
+}
+
+/* ---------- 시설 추가·제외 ---------- */
+let adding = false;
+const addBtn = document.getElementById('addMode');
+addBtn.onclick = () => { adding = !adding; addBtn.setAttribute('aria-pressed', adding);
+  addBtn.textContent = adding ? '추가 중 · 지도를 클릭 (끝내기)' : '＋ 지도에서 추가';
+  document.body.classList.toggle('adding', adding); };
+map.on('click', e => {
+  if (typeof MEAS !== 'undefined' && MEAS.on) return;
+  if (!adding) { if (isMobile() && sheetState !== 'peek') setSheet('peek'); return; }
+  const {lat, lng} = e.latlng;
+  L.popup({className:'fac-popup', minWidth:250}).setLatLng(e.latlng).setContent(`<div class="fp fac-form">
+      <div class="fp-name">이 위치에 시설 추가</div>
+      <label class="fp-field"><span>종류</span><select id="nfKind">${KINDS.map(k=>`<option value="${k}"${k==='elementary'?' selected':''}>${KNAME[k]}</option>`).join('')}</select></label>
+      <label class="fp-field"><span>이름</span><input id="nfName" placeholder="예: 초림초등학교" autocomplete="off"></label>
+      <button class="fp-btn primary" id="nfSave" data-lat="${lat}" data-lng="${lng}">추가하기</button></div>`).openOn(map);
+  setTimeout(() => document.getElementById('nfName')?.focus(), 50);
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act], #nfSave') || e.target;
+  if (t.id === 'nfSave') {
+    const name = document.getElementById('nfName').value.trim().replace(/역$/, '');
+    if (!name) return;
+    CUSTOM.added.push({kind:document.getElementById('nfKind').value, name, lat:+t.dataset.lat, lng:+t.dataset.lng});
+    store.set('custom', CUSTOM); map.closePopup(); recalc();
+  } else if (t.dataset && t.dataset.act === 'exclude') {
+    CUSTOM.excluded.push({kind:t.dataset.kind, name:t.dataset.name}); store.set('custom', CUSTOM); map.closePopup(); recalc();
+  } else if (t.dataset && t.dataset.act === 'del') {
+    CUSTOM.added = CUSTOM.added.filter(x => !(x.kind===t.dataset.kind && x.name===t.dataset.name)); store.set('custom', CUSTOM); map.closePopup(); recalc();
+  } else if (t.dataset && t.dataset.act === 'tr-year') {
+    const tb = t.closest('tbody'), open = tb.classList.toggle('open'); t.setAttribute('aria-expanded', open);
+  } else if (t.dataset && t.dataset.act === 'pick-unit') {
+    map.closePopup(); const mk = markers[t.dataset.id]; if (mk) setTimeout(() => openUnit(mk), 0);
+  } else if (t.dataset && t.dataset.act === 'unit-close') {
+    state.unit = null; try { history.replaceState(null, '', location.pathname + location.search); } catch {} render(); document.querySelector('.panel').scrollTop = 0;
+  } else if (t.dataset && t.dataset.act === 'unit-share') {
+    const u = D.units.find(x => x.id === t.dataset.id), url = unitLink(t.dataset.id);
+    if (navigator.share) navigator.share({title: u ? u.name : '단지', url}).catch(() => {});
+    else navigator.clipboard?.writeText(url).then(() => toast('단지 링크를 복사했습니다.'), () => toast(url));
+  } else if (t.dataset && t.dataset.act === 'unit-trades') {
+    const h = document.getElementById('unitTrades'); if (h) { if (isMobile() && sheetState !== 'full') setSheet('full'); setTimeout(() => h.scrollIntoView({behavior:'smooth', block:'start'}), 250); }
+  } else if (t.dataset && t.dataset.act === 'yr-toggle') {
+    const tbl = t.previousElementSibling, open = tbl.classList.toggle('yr-all');
+    t.setAttribute('aria-expanded', open);
+    t.firstChild.textContent = open ? '최근 5개 연도만 보기 ' : `이전 ${tbl.querySelectorAll('tr.yr-old').length}개 연도 보기 `;
+  } else if (t.dataset && t.dataset.act === 'unit-open') {
+    map.closePopup(); selectUnit(t.dataset.id, true);
+  } else if (t.dataset && t.dataset.act === 'dock-open') {
+    const u = D.units.find(x => x.id === t.dataset.id); if (u) showDock(u);
+  } else if (t.dataset && t.dataset.act === 'card-close') {
+    hideDock();
+  } else if (t.dataset && t.dataset.act === 'unit-detail') {
+    if (state.unit !== t.dataset.id) selectUnit(t.dataset.id, false);
+    const h = document.getElementById('unitTables'); if (h) h.scrollIntoView({behavior:'smooth', block:'start'});
+  } else if (t.dataset && t.dataset.act === 'restore') {
+    CUSTOM.excluded = CUSTOM.excluded.filter(x => !(x.kind===t.dataset.kind && x.name===t.dataset.name)); store.set('custom', CUSTOM); recalc();
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'nfName') document.getElementById('nfSave').click();
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset && e.target.dataset.act === 'tr-year') { e.preventDefault(); e.target.click(); } });
+document.getElementById('facExport').onclick = () => {
+  const blob = new Blob([JSON.stringify(CUSTOM, null, 1)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'custom_facilities.json'; a.click();
+};
+function drawFacList(){
+  const li = (x, act, label) => `<li>${KNAME[x.kind]} ${esc(x.name)}<button data-act="${act}" data-kind="${x.kind}" data-name="${esc(x.name)}">${label}</button></li>`;
+  document.getElementById('facList').innerHTML =
+    (CUSTOM.added.length ? `<p class="note" style="margin:6px 0 0">직접 추가 ${CUSTOM.added.length}곳</p><ul>${CUSTOM.added.map(x=>li(x,'del','삭제')).join('')}</ul>` : '')
+    + (CUSTOM.excluded.length ? `<p class="note" style="margin:6px 0 0">제외 ${CUSTOM.excluded.length}곳</p><ul>${CUSTOM.excluded.map(x=>li(x,'restore','복원')).join('')}</ul>` : '');
+}
+
+/* ---------- 차트·표 ---------- */
+let charts = [];
+const prov = i => i >= D.months.length - D.provisional;
+const dash = {borderDash: ctx => prov(ctx.p1DataIndex) ? [5,4] : undefined};
+function lineChart(el, datasets, yTitle, opts={}) {
+  const c = new Chart(el, {type:'line', data:{labels:D.months.map(ymLabel), datasets},
+    options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{boxWidth:10,color:css('--ink')}}},
+      scales:{x:{ticks:{color:css('--sub'),maxRotation:0,autoSkip:true}},
+              y:{title:{display:true,text:yTitle,color:css('--sub')},ticks:{color:css('--sub')},beginAtZero:opts.zero!==false}},
+      spanGaps:true}});
+  charts.push(c); return c;
+}
+const ds = (label, data, color, extra={}) => ({label, data, borderColor:color, backgroundColor:color, borderWidth:2, pointRadius:2, tension:.25, segment:dash, ...extra});
+const COLS = [['units','단지'],['listingsAll','전체 매물'],['listings','매물'],['trades3All','전체 3개월 거래'],['trades3','3개월 거래'],
+  ['absorb','실매매율 %'],['gap','호가 괴리'],['listPpp','평당 호가(만)'],['days','노출일'],['realtors','중개사']];
+const cell = (k,v) => k==='gap' ? `<td class="${v>0?'pos':''}">${pct(v)}</td>` : `<td${(k==='listings'||k==='trades3')&&v?' class="hi"':''}>${num(v)}</td>`;
+const head = first => `<thead><tr><th>${first}</th>${COLS.map(c=>`<th>${c[1]}${(c[0]==='listings'||c[0]==='trades3')&&state.scope!=='all'?` <small>(${SCOPE_NAME[state.scope]})</small>`:''}</th>`).join('')}</tr></thead>`;
+const row = (label, s, attr='') => `<tr${attr}><td>${label}</td>${COLS.map(([k])=>cell(k,s[k])).join('')}</tr>`;
+function gradeTable(s){
+  return `<div class="tbl"><table>${head('접근등급')}<tbody>${['상','중','하'].map(g=>row(`<span class="chip g${g}">${g}</span>`, s[g])).join('')}${row('<b>합계</b>', s.all)}</tbody></table></div>`
+    + (s.noCoord ? `<p class="note">접근성을 계산하지 못한 단지 ${s.noCoord}개는 합계에만 포함됩니다.</p>` : '');
+}
+const ruleText = () => '접근점수: ' + KINDS.map(k => `${KNAME[k]} ${CFG.walk[k]}m(${CFG.weight[k]})`).join(', ')
+  + `. 기준거리의 ${Math.round(CFG.fullRatio*100)}% 안 만점, ${Math.round(CFG.zeroRatio*100)}%에서 0점. ${CFG.cuts[0]}점 이상 상, ${CFG.cuts[1]}점 이상 중. `
+  + '실매매율 = 최근 3개월 월평균 거래 ÷ 현재 매물. 호가 괴리 = 현재 평당 호가 ÷ 최근 6개월 평당 실거래가 − 1.';
+function sumLast(arr, n, off=0){ const a = arr.slice(0, arr.length - D.provisional);
+  return a.slice(Math.max(0, a.length - off - n), a.length - off).reduce((x,y)=>x+(y||0),0); }
+/* 요약 문장 강조: 숫자 굵게, 증감은 색(증가 녹색·감소 빨강), 비중은 파랑 */
+const em = v => `<b class="lx">${v}</b>`;
+const emChg = (v, unit='%') => v==null ? em('비교 불가') : `<b class="lx ${v>0?'up':v<0?'down':''}">${v>0?'▲ +':v<0?'▼ ':''}${v}${unit}</b>`;
+const emBlue = v => `<b class="lx blue">${v}</b>`;
+/* 정보 없음(방 수·세대수 미상)은 조건에서 빼지 않고 포함 → 몇 건이 그렇게 들어왔는지 보여 줘서 사람이 판단 */
+function unknownInfo(dong){
+  if (state.scope === 'all') return null;
+  const grp = D.units.filter(u => dong==='전체' || u.dong===dong);
+  const a = D.months.length - D.provisional, lo = a - 3;            // 상단 '최근 3개월'과 같은 구간
+  const roomOn = FILTER.rooms.length > 0, hhOn = state.scope === 'filt' && (FILTER.hhMin != null || FILTER.hhMax != null);
+  let rT = 0, rL = 0, hU = 0;
+  grp.forEach(u => {
+    if (roomOn) { rT += u.trIn[state.scope].filter(t => t[6] == null && t[0] >= lo && t[0] < a).length; rL += u.m[state.scope].unkRoomL; }
+    if (hhOn && u.households == null && (u.m.filt.listings > 0 || u.trIn.filt.length > 0)) hU++;
+  });
+  return {roomOn, hhOn, rT, rL, hU};
+}
+function leadText(dong){
+  const s = SERIES[state.scope][dong], S = STATS[state.scope][dong], sAll = SERIES.all[dong];
+  const now3 = sumLast(s.all.count,3), prev3 = sumLast(s.all.count,3,3);
+  const chg = prev3 ? Math.round((now3/prev3-1)*100) : null;
+  const tops = ['상','중','하'].map(g=>sumLast(s[g].count,3)), tot = tops.reduce((a,b)=>a+b,0);
+  const share = tot ? Math.round(tops[0]/tot*100) : null;
+  const types = {}; D.units.filter(u => dong==='전체' || u.dong===dong).forEach(u => { if (u.type) types[u.type] = (types[u.type]||0)+1; });
+  const all3 = sumLast(sAll.all.count,3), sh = all3 ? Math.round(now3/all3*100) : null;
+  const allPrev3 = sumLast(sAll.all.count,3,3), chgAll = allPrev3 ? Math.round((all3/allPrev3-1)*100) : null;
+  const lsh = S.all.listingsAll ? Math.round(S.all.listings/S.all.listingsAll*100) : null;
+  const tag = state.scope==='filt' ? '필터 거래' : '평형·방 거래';
+  const cond = state.scope==='all' ? '전체' : SCOPE_NAME[state.scope];
+  const condTxt = state.scope==='filt' ? filterText() : state.scope==='area' ? `공급 ${FILTER.areaMin}~${FILTER.areaMax}평${roomText()}` : '';
+  const gap = S.all.gap;
+  const TYPE_C = {'역+초교':'#2453c4','역세권':'#d7263d','초교 인접':'#16a34a','일반':'#8a98ab'};
+  return `<span class="lx-head"><b>${esc(dong==='전체'?'5개 동':dong)}</b> · ${cond}${condTxt?` <small>${esc(condTxt)}</small>`:''}</span>
+    <span class="lx-line"><span class="lx-tag">전체 거래</span>최근 3개월 ${em(num(all3)+'건')} · 직전 3개월 대비 ${emChg(chgAll)}${state.scope==='all' ? ` · 접근 상위 단지 비중 ${emBlue((share??'–')+'%')}` : ''}</span>
+    ${state.scope!=='all' ? `<span class="lx-line"><span class="lx-tag hl">${tag}</span>최근 3개월 ${em(num(now3)+'건')} (전체의 ${emBlue((sh??'–')+'%')}) · 직전 3개월 대비 ${emChg(chg)} · 접근 상위 단지 비중 ${emBlue((share??'–')+'%')}</span>` : ''}
+    <span class="lx-line"><span class="lx-tag">매물</span>전체 ${em(num(S.all.listingsAll)+'건')}${state.scope!=='all' ? ` · 조건 ${em(num(S.all.listings)+'건')} (${emBlue((lsh??'–')+'%')})` : ''}
+      · 실매매율 ${em((S.all.absorb??'–')+'%')} · 호가 괴리 <b class="lx ${gap>10?'down':gap>0?'warn':''}">${pct(gap)}</b></span>
+    ${unknownLine(dong)}
+    <span class="lx-line"><span class="lx-tag">입지</span>${['역+초교','역세권','초교 인접','일반'].map(t =>
+      `<span class="lx-chip"><i style="background:${TYPE_C[t]}"></i>${t} <b>${types[t]||0}</b></span>`).join('')}</span>`;
+}
+function unknownLine(dong){
+  const U = unknownInfo(dong);
+  if (!U) return '';
+  const parts = [U.roomOn && (U.rT || U.rL) ? `방 정보 없음 최근 3개월 거래 ${em(num(U.rT)+'건')} · 매물 ${em(num(U.rL)+'건')}` : '',
+                 U.hhOn && U.hU ? `세대수 정보 없음 단지 ${em(U.hU+'개')}` : ''].filter(Boolean);
+  return parts.length ? `<span class="lx-line"><span class="lx-tag chk">확인</span>${parts.join(' · ')} <small>(조건 판단이 안 돼 포함)</small></span>` : '';
+}
+function render(){
+  renderCore();
+  if (isMobile() && sheetState === 'peek') requestAnimationFrame(() => { if (sheetState === 'peek') setSheet('peek'); });   // 내용 길이가 바뀌어도 '전체 거래' 줄에 맞춤
+}
+function renderCore(){
+  try { renderInner(); }
+  catch (e) { console.error(e);
+    document.getElementById('view').innerHTML = `<div class="lead" style="border-color:#b5446e"><b>표시 중 오류가 났습니다.</b> 아래 내용을 복사해 알려주세요.<pre style="white-space:pre-wrap;font-size:.78rem">${esc(e.stack || e)}</pre></div>`; }
+}
+function renderInner(){
+  charts.forEach(c=>c.destroy()); charts = [];
+  const v = document.getElementById('view'), dong = state.dong, sc = SERIES[state.scope], ST = STATS[state.scope];
+  if (state.unit) { const u = D.units.find(x => x.id===state.unit); if (u) return renderUnit(u, v); }
+  if (dong==='전체'){
+    v.innerHTML = `<p class="lead">${leadText('전체')}</p>
+      <h2>분당구 기준선</h2><p class="note">한국부동산원 월간 아파트 매매가격지수와 매매거래(호수). 동별 수치와 기준일이 달라 같은 축에 놓지 않습니다.</p>
+      <div class="chart"><canvas id="c0"></canvas></div>
+      ${yearlySection()}
+      <h2>동별 월간 거래 (${SCOPE_NAME[state.scope]})</h2><p class="note">국토부 계약월 기준 거래 건수. 회색 점선은 같은 동의 전체 거래입니다.</p><div class="chart"><canvas id="c1"></canvas></div>
+      <h2>동별 현재</h2><p class="note">행을 누르면 해당 동으로 이동합니다.</p>
+      <div class="tbl"><table>${head('동')}<tbody>${D.dongs.map(d=>row(esc(d), ST[d].all, ` tabindex="0" data-dong="${esc(d)}"`)).join('')}
+      ${row('<b>5개 동</b>', ST['전체'].all)}</tbody></table></div>
+      <h2>접근등급별 (5개 동)</h2><p class="note">${ruleText()}</p>${gradeTable(ST['전체'])}`;
+    if (D.rone.months.length) charts.push(new Chart(document.getElementById('c0'), {data:{labels:D.rone.months.map(ymLabel), datasets:[
+        {type:'line', label:'매매가격지수', data:D.rone.index, borderColor:'#2453c4', backgroundColor:'#2453c4', yAxisID:'y', tension:.25, pointRadius:2},
+        {type:'bar', label:'매매거래(호)', data:D.rone.volume, backgroundColor:'rgba(154,165,177,.55)', yAxisID:'y1'}]},
+      options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+        plugins:{legend:{labels:{boxWidth:10,color:css('--ink')}}},
+        scales:{x:{ticks:{color:css('--sub')}}, y:{position:'left',ticks:{color:css('--sub')}},
+                y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:css('--sub')},beginAtZero:true}}}}));
+    lineChart(document.getElementById('c1'), [...D.dongs.map(d=>ds(d, sc[d].all.count, DONG_COLORS[d])),
+      ...(state.scope!=='all' ? [ds('5개 동 전체 거래', SERIES.all['전체'].all.count, '#9aa5b1', {borderDash:[3,3], pointRadius:0, borderWidth:1.5, segment:{}})] : [])], '건');
+    v.querySelectorAll('tr[data-dong]').forEach(tr=>{ tr.onclick=()=>select(tr.dataset.dong);
+      tr.onkeydown=e=>{ if(e.key==='Enter') select(tr.dataset.dong); }; });
+    return;
+  }
+  const allInDong = D.units.filter(u=>u.dong===dong);
+  const units = allInDong.filter(shown).sort((a,b)=>(b.m.filt.listings-a.m.filt.listings)||((b.score??-1)-(a.score??-1)));
+  v.innerHTML = `<p class="lead">${leadText(dong)}</p>
+    <h2>${esc(dong)} 접근등급별 월간 거래 (${SCOPE_NAME[state.scope]})</h2><p class="note">회색 막대는 같은 동의 전체 거래(평형·가격 무관). 상위 등급 선이 먼저 오르면 좋은 입지부터 수요가 붙는 흐름입니다.</p>
+    <div class="chart"><canvas id="c1"></canvas></div>
+    <h2>${esc(dong)} 접근등급별 평당 실거래가</h2><p class="note">월별 중앙값(만원/공급평). 등급 간 격차가 입지 프리미엄입니다.</p>
+    <div class="chart"><canvas id="c2"></canvas></div>
+    <h2>${esc(dong)} 현재 (등급별)</h2><p class="note">${ruleText()}</p>${gradeTable(ST[dong])}
+    <h2>${esc(dong)} 단지 (${state.only ? `필터 해당 ${units.length} / 전체 ${allInDong.length}` : units.length})</h2><p class="note">필터 조건 매물 많은 순. 행을 누르면 단지 상세(평형별 시세·거래 내역)를 엽니다.</p>
+    <div class="tbl"><table><thead><tr><th>단지</th><th>년차</th><th>추이</th><th>입지</th><th>등급</th><th>역</th><th>초</th><th>중</th><th>고</th>
+      <th>전체 매물</th><th>필터 매물</th><th>전체 3개월</th><th>필터 3개월</th><th>필터 호가</th><th>괴리</th></tr></thead><tbody>${
+      units.map(u=>{ const T = u.m[state.scope]; return `<tr tabindex="0" data-id="${u.id}"><td>${esc(u.name)} ${rzPill(u)}${
+        state.scope==='filt' && (FILTER.hhMin!=null || FILTER.hhMax!=null) && u.households==null ? ' <span class="unk" title="세대수 정보 없음: 조건으로 판단하지 못해 포함">세대?</span>' : ''}</td>
+        <td>${u.age??'–'}</td><td class="${T.trend}" title="최근 6개월 ${T.now6}건 / 직전 6개월 ${T.bef6}건">${ARROW[T.trend]} ${T.now6}/${T.bef6}</td>
+        <td>${esc(u.type??'–')}</td>
+        <td><span class="chip ${u.grade?'g'+u.grade:'gnone'}">${u.grade??'?'}</span> ${u.score??''}</td>
+        ${KINDS.map(k=>`<td>${u.near[k]?m(u.near[k][1]):'–'}</td>`).join('')}
+        <td>${u.m.all.listings}</td><td${u.m.filt.listings?' class="hi"':''}>${u.m.filt.listings}</td>
+        <td>${u.m.all.trades3}</td><td${u.m.filt.trades3?' class="hi"':''}>${u.m.filt.trades3}</td>
+        <td>${u.m.filt.listRange?won(u.m.filt.listRange[0]*1e4)+'~'+won(u.m.filt.listRange[1]*1e4):'–'}</td>
+        <td class="${u.m.filt.gap>0?'pos':''}">${pct(u.m.filt.gap)}</td></tr>`; }).join('')}</tbody></table></div>`;
+  const s = sc[dong];
+  lineChart(document.getElementById('c1'), [...['상','중','하'].map(g=>ds('접근 '+g, s[g].count, GRADE_COLORS[g])),
+    {type:'bar', label:'동 전체 거래', data:SERIES.all[dong].all.count, backgroundColor:'rgba(154,165,177,.25)', borderWidth:0, order:9}], '건');
+  lineChart(document.getElementById('c2'), ['상','중','하'].map(g=>ds('접근 '+g, s[g].ppp, GRADE_COLORS[g])), '만원/평', {zero:false});
+  v.querySelectorAll('tr[data-id]').forEach(tr=>{
+    const open=()=>selectUnit(tr.dataset.id, true);
+    tr.onclick=open; tr.onkeydown=e=>{ if(e.key==='Enter') open(); }; });
+}
+
+/* ---------- 연도별 금리와 집값 ---------- */
+const sgn = v => v==null ? '–' : (v>0?'+':'')+v.toFixed(1)+'%';
+const emChgF = v => v==null ? em('–') : `<b class="lx ${v>0?'up':v<0?'down':''}">${v>0?'+':''}${v.toFixed(1)}%</b>`;
+function yearlySummary(Y){
+  const full = Y.filter(r => !r.partial && r.idxChg!=null && r.baseEnd!=null);
+  const grp = {cut:[], hike:[], hold:[]};
+  full.forEach((r, i) => { const p = Y[Y.indexOf(r)-1]; if (!p || p.baseEnd==null) return;
+    (r.baseEnd < p.baseEnd ? grp.cut : r.baseEnd > p.baseEnd ? grp.hike : grp.hold).push(r.idxChg); });
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  const best = full.length ? full.reduce((a,b) => b.idxChg > a.idxChg ? b : a) : null;
+  const worst = full.length ? full.reduce((a,b) => b.idxChg < a.idxChg ? b : a) : null;
+  const beat = full.filter(r => r.mort!=null && r.idxChg > r.mort).length, withM = full.filter(r => r.mort!=null).length;
+  const parts = [];
+  if (grp.cut.length || grp.hike.length)
+    parts.push(`<span class="lx-line"><span class="lx-tag">금리</span>기준금리를 내린 해(${grp.cut.length}번) 분당구 집값 평균 ${emChgF(avg(grp.cut))}, 올린 해(${grp.hike.length}번) ${emChgF(avg(grp.hike))}${grp.hold.length?`, 동결한 해(${grp.hold.length}번) ${emChgF(avg(grp.hold))}`:''}</span>`);
+  if (withM) parts.push(`<span class="lx-line"><span class="lx-tag">이자</span>집값 상승률이 그해 주담대 금리보다 높았던 해는 ${withM}년 중 ${emBlue(beat+'년')}</span>`);
+  if (best && worst) parts.push(`<span class="lx-line"><span class="lx-tag">최대</span>가장 많이 오른 해 ${em(best.y+'년')} ${emChgF(best.idxChg)}, 가장 많이 내린 해 ${em(worst.y+'년')} ${emChgF(worst.idxChg)}</span>`);
+  return parts.join('');
+}
+function yearlySection(){
+  const Y = D.yearly || [];
+  if (!Y.length) return '';
+  setTimeout(() => {
+    const el = document.getElementById('cy'); if (!el) return;
+    charts.push(new Chart(el, {data:{labels:Y.map(r => r.partial ? `${r.y}*` : `${r.y}`), datasets:[
+        {type:'bar', label:'분당구 집값 상승률', data:Y.map(r=>r.idxChg), backgroundColor:Y.map(r => r.idxChg<0 ? 'rgba(215,38,61,.7)' : 'rgba(36,83,196,.75)'), order:3},
+        {type:'bar', label:'5개 동 평당가 상승률', data:Y.map(r=>r.pppChg), backgroundColor:'rgba(224,154,0,.65)', order:4},
+        {type:'line', label:'주담대 금리', data:Y.map(r=>r.mort), borderColor:'#7a5bc2', backgroundColor:'#7a5bc2', borderWidth:2, pointRadius:2, tension:.2, order:1, spanGaps:true},
+        {type:'line', label:'기준금리', data:Y.map(r=>r.base), borderColor:'#1d2733', backgroundColor:'#1d2733', borderWidth:2, borderDash:[4,3], pointRadius:2, tension:.2, order:2, spanGaps:true}]},
+      options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
+        plugins:{legend:{labels:{boxWidth:10, color:css('--ink')}}, tooltip:{callbacks:{label:c => `${c.dataset.label} ${c.raw==null?'–':c.raw.toFixed(c.dataset.type==='line'?2:1)+'%'}`}}},
+        scales:{x:{ticks:{color:css('--sub'), maxRotation:0, autoSkip:true}},
+                y:{title:{display:true, text:'%', color:css('--sub')}, ticks:{color:css('--sub')}, grid:{color:c => c.tick.value===0 ? '#9aa5b1' : 'rgba(154,165,177,.2)'}}}}}));
+  }, 0);
+  const cur = Y.find(r => r.partial);
+  return `<h2>연도별 금리와 집값</h2>
+    <p class="note">막대는 집값 상승률(분당구는 한국부동산원 매매가격지수의 전년 말 대비, 5개 동은 실거래 전용 평당가 중앙값의 전년 대비), 선은 금리(한국은행, 연평균).
+      ${cur ? `${cur.y}*는 ${cur.lastMonth}월까지의 연중 수치입니다.` : ''}</p>
+    <div class="chart" style="height:290px"><canvas id="cy"></canvas></div>
+    <p class="lead">${yearlySummary(Y)}</p>
+    <div class="tbl"><table><thead><tr><th>연도</th><th>기준금리<br><small>연말</small></th><th>주담대 금리<br><small>연평균</small></th>
+      <th>분당구 상승률</th><th>상승률 − 대출금리</th><th>5개 동 평당가<br><small>전용, 만원</small></th><th>평당가 상승률</th><th>거래</th></tr></thead><tbody>${
+      [...Y].reverse().map((r, i) => { const gap = r.idxChg!=null && r.mort!=null ? r.idxChg - r.mort : null;
+        return `<tr${i >= 5 ? ' class="yr-old"' : ''}><td><b>${r.y}${r.partial?'*':''}</b></td><td>${r.baseEnd!=null?r.baseEnd.toFixed(2)+'%':'–'}</td><td>${r.mort!=null?r.mort.toFixed(2)+'%':'–'}</td>
+        <td class="${r.idxChg>0?'up':r.idxChg<0?'down':''}">${sgn(r.idxChg)}</td>
+        <td class="${gap>0?'up':gap<0?'down':''}">${gap==null?'–':sgn(gap)}</td>
+        <td>${num(r.ppp)}</td><td class="${r.pppChg>0?'up':r.pppChg<0?'down':''}">${sgn(r.pppChg)}</td><td>${r.cnt?num(r.cnt):'–'}</td></tr>`; }).join('')}
+    </tbody></table></div>
+    ${Y.length > 5 ? `<button class="yr-more" data-act="yr-toggle" aria-expanded="false">이전 ${Y.length - 5}개 연도 보기 <i aria-hidden="true"></i></button>` : ''}
+    <p class="note">"상승률 − 대출금리"가 플러스면 그해 집값이 대출 이자보다 더 올랐다는 뜻입니다(세금·거래비용 제외). 평당가는 실거래가 100건 이상인 해만 표시합니다.</p>`;
+}
+
+/* ---------- 단지 상세 ---------- */
+const PALETTE = ['#2453c4','#e09a00','#b5446e','#2f8f9d','#7a5bc2','#c46a2b','#5b6775'];
+function renderUnit(u, v){
+  const n = D.months.length, in6 = i => i >= n - 7 && i < n - 1;
+  const key = sup => Math.round(sup/PY);
+  const keys = [...new Set([...u.py.map(p=>key(p[0])), ...u.tr.map(t=>key(t[3])), ...u.ar.map(a=>key(a[1]))])].sort((a,b)=>a-b);
+  const rows = keys.map(k => {
+    const py = u.py.filter(p => key(p[0])===k), trs = u.tr.filter(t => key(t[3])===k).sort((a,b)=>(b[4]||'').localeCompare(a[4]||''));
+    const ars = u.ar.filter(a => key(a[1])===k);
+    const sup = py[0]?.[0] ?? trs[0]?.[3] ?? ars[0]?.[1], ex = py[0]?.[1] ?? trs[0]?.[2] ?? ars[0]?.[2];
+    const rooms = py.find(p => p[4]!=null)?.[4] ?? trs.find(t => t[6]!=null)?.[6] ?? ars.find(a => a[7]!=null)?.[7] ?? null;
+    const lastT = trs[0], t6 = trs.filter(t => in6(t[0])), med6 = t6.length ? med(t6.map(t=>t[1])) : null;
+    const minA = ars.length ? Math.min(...ars.map(a=>a[0])) : null;
+    const ref = med6 ?? (lastT ? lastT[1] : minA);
+    const filt = sup && unitOK(u) && inFilterArea(sup) && roomOK(rooms) && ref != null && inFilterPrice(ref);
+    return {k, sup, ex, rooms, hh: py.reduce((a,p)=>a+(p[2]||0),0), lastT, t6:t6.length, med6, cntA: ars.length, minA, filt};
+  });
+  const T = u.m[state.scope];
+  const near = KINDS.filter(k=>u.near[k]).map(k => `${KLABEL[k]} ${esc(u.near[k][0])} ${m(u.near[k][1])}`).join(' · ');
+  const trList = [...u.tr].sort((a,b)=>(b[4]||'').localeCompare(a[4]||''));
+  // 연도별로 묶기: 올해(없으면 가장 최근 연도)만 펼치고 나머지는 눌러서 펼침
+  const byYear = {};
+  trList.forEach(t => (byYear[(t[4]||'').slice(0,4) || '–'] ||= []).push(t));
+  const years = Object.keys(byYear).sort().reverse();
+  const thisYear = String(new Date(D.date).getFullYear());
+  const openYear = byYear[thisYear] ? thisYear : years[0];
+  const trRow = t => `<tr class="tr-d"${unitOK(u)&&inFilterArea(t[3])&&roomOK(t[6])&&inFilterPrice(t[1])?' style="background:color-mix(in srgb,var(--accent) 7%,transparent)"':''}>
+        <td>${fmtDate(t[4])}</td><td>${pyLabel(t[3])}</td><td>${t[6]??'–'}</td><td>${t[2]}</td><td>${t[5]??'–'}</td><td><b>${won(t[1]*1e4)}</b></td><td>${num(Math.round(t[1]/(t[3]/PY)))}</td></tr>`;
+  const yearBody = y => { const ts = byYear[y], md = med(ts.map(t=>t[1])), fc = ts.filter(t => unitOK(u)&&inFilterArea(t[3])&&roomOK(t[6])&&inFilterPrice(t[1])).length;
+    return `<tbody class="ty${y===openYear?' open':''}"><tr class="ty-h" data-act="tr-year" tabindex="0" aria-expanded="${y===openYear}">
+      <td colspan="7"><i class="ty-caret" aria-hidden="true"></i><b>${y}년</b>${y===thisYear?' <span class="ty-now">올해</span>':''}
+        <span class="ty-sum">${ts.length}건 · 중앙값 <b>${won(md*1e4)}</b>${fc?` · 필터 해당 ${fc}건`:''}</span>
+        <div class="ty-pys">${pyCounts(ts).map(([k, c]) => `<span class="ty-py${inFilterArea(k*PY)?' in':''}">${k}평 <b>${c}</b></span>`).join('')}</div></td></tr>${ts.map(trRow).join('')}</tbody>`; };
+  const arList = [...u.ar].sort((a,b)=>a[0]-b[0]);
+  v.innerHTML = `<p style="margin:12px 0 0"><button class="pill" id="backBtn">← ${esc(u.dong)} 단지 목록</button></p>
+    ${isMobile() ? `<div class="acard-wrap">${unitCard(u, {cta:false, open:true})}</div>`
+      : `<div class="unit-h"><h2>${esc(u.name.replace(/\(네이버\)$/,''))}</h2>${rzPill(u)}<span>${esc(u.dong)}${u.households?` · ${num(u.households)}세대`:''}${u.age?` · ${u.age}년차`:''}${u.type?` · ${esc(u.type)}`:''}</span>
+         <button class="pill" data-act="dock-open" data-id="${u.id}">지도 카드 열기</button></div>`}
+    <h2 id="unitTables">평형별 시세</h2><p class="note">필터 열은 공급평형과 최근 6개월 실거래 중앙값(없으면 최근 거래나 최저 호가)이 필터 조건(${filterText()})에 드는지입니다.</p>
+    <div class="tbl"><table><thead><tr><th>평형</th><th>방</th><th>전용㎡</th><th>세대</th><th>최근 실거래</th><th>6개월 거래</th><th>6개월 중앙값</th><th>매물</th><th>최저 호가</th><th>필터</th></tr></thead><tbody>${
+      rows.map(r => `<tr><td><b>${r.k}평</b></td><td>${r.rooms??'–'}</td><td>${r.ex??'–'}</td><td>${r.hh?num(r.hh):'–'}</td>
+        <td>${r.lastT?`<b>${won(r.lastT[1]*1e4)}</b> <small>${fmtDate(r.lastT[4])}${r.lastT[5]!=null?' · '+r.lastT[5]+'층':''}</small>`:'–'}</td>
+        <td>${r.t6}</td><td>${r.med6?won(r.med6*1e4):'–'}</td><td>${r.cntA}</td><td>${r.minA?won(r.minA*1e4):'–'}</td>
+        <td>${r.filt?'<span class="chip g상">해당</span>':''}</td></tr>`).join('')}</tbody></table></div>
+    <section id="unitChart"><h2>실거래가 흐름</h2><p class="note">점은 실거래(계약일), 세모는 현재 호가입니다. 평형별 색으로 구분합니다.</p>
+    <div class="chart" style="height:280px"><canvas id="cu"></canvas></div></section>
+    <h2 id="unitTrades">실거래 내역 (${trList.length}건)</h2>
+    <p class="note">연도를 누르면 그해 거래가 펼쳐집니다.</p>
+    <div class="tbl"><table class="tr-tbl"><thead><tr><th>계약일</th><th>평형</th><th>방</th><th>전용㎡</th><th>층</th><th>거래가</th><th>평당(만)</th></tr></thead>${
+      years.map(yearBody).join('') || '<tbody><tr><td colspan="7">실거래 없음</td></tr></tbody>'}</table></div>
+    <h2>현재 매물 (${arList.length})</h2>
+    <div class="tbl"><table><thead><tr><th>평형</th><th>방</th><th>동</th><th>층</th><th>호가</th><th>평당(만)</th><th>노출일</th><th>중개사</th></tr></thead><tbody>${
+      arList.map(a => `<tr${unitOK(u)&&inFilterArea(a[1])&&roomOK(a[7])&&inFilterPrice(a[0])?' style="background:color-mix(in srgb,var(--accent) 7%,transparent)"':''}>
+        <td>${pyLabel(a[1])}</td><td>${a[7]??'–'}</td><td>${esc(a[6]??'–')}</td><td>${esc(a[5]??'–')}</td><td><b>${won(a[0]*1e4)}</b></td><td>${num(Math.round(a[0]/(a[1]/PY)))}</td>
+        <td>${a[3]??'–'}</td><td>${a[4]??'–'}</td></tr>`).join('') || '<tr><td colspan="8">매물 없음 (네이버 미수집 단지일 수 있음)</td></tr>'}</tbody></table></div>
+    <p class="note">파란 배경 행은 필터 조건(${filterText()})에 맞는 거래·매물입니다.</p>`;
+  if (isMobile()) {   // 모바일: 장소 카드처럼 큰 제목·요약·동작 버튼 → 실거래가 흐름 차트 → 상세
+    const ch = document.getElementById('unitChart'), card = v.querySelector('.acard-wrap');
+    const nm = u.name.replace(/\(네이버\)$/,''), lastT = [...u.tr].sort((a,b)=>(b[4]||'').localeCompare(a[4]||''))[0];
+    const land = u.cn ? `https://fin.land.naver.com/complexes/${u.cn}` : `https://search.naver.com/search.naver?query=${encodeURIComponent('성남 '+u.dong+' '+nm+' 아파트')}`;
+    const route = `https://map.naver.com/p/search/${encodeURIComponent('성남시 분당구 '+u.dong+' '+nm)}`;
+    const head = document.createElement('div'); head.className = 'uh';
+    head.innerHTML = `<div class="uh-top"><h2 class="uh-title">${esc(nm)}</h2>
+        <button class="uh-x" data-act="unit-close" aria-label="닫기">×</button></div>
+      ${u.rz ? `<div class="uh-meta">${rzPill(u, true)}</div>` : ''}
+      <div class="uh-meta">아파트${u.households?` · ${num(u.households)}세대`:''}${u.age?` · ${u.age}년차 (${u.built})`:''}</div>
+      ${u.type ? `<div class="uh-meta"><b>${esc(u.type)}</b> · 접근 ${u.score}점 <span class="uh-g g-${u.grade}">${GRADE_WORD[u.grade]}</span></div>` : ''}
+      <div class="uh-meta">${esc(u.dong)}${lastT ? ` · 최근 실거래 <b>${won(lastT[1]*1e4)}</b> (${fmtDate(lastT[4])})` : ''}</div>
+      <div class="uh-actions">
+        <a class="uh-btn primary" href="${land}" target="_blank" rel="noopener">네이버부동산</a>
+        <a class="uh-btn" href="${route}" target="_blank" rel="noopener">지도·길찾기</a>
+        <button class="uh-btn" data-act="unit-share" data-id="${u.id}">공유</button>
+        <button class="uh-btn" data-act="unit-trades">실거래</button></div>`;
+    ch.querySelector('h2').innerHTML = '실거래가 흐름';
+    ch.querySelector('.chart').style.height = '230px';
+    v.insertBefore(head, v.firstChild);
+    v.insertBefore(ch, card);
+  }
+  document.getElementById('backBtn').onclick = () => { state.unit = null; hideDock(); render(); document.querySelector('.panel').scrollTop = 0; };
+  const top = rows.filter(r => u.tr.some(t => key(t[3])===r.k) || u.ar.some(a => key(a[1])===r.k)).map(r => r.k);
+  const today = new Date(D.date).getTime();
+  const sets = top.flatMap((k, i) => { const c = PALETTE[i % PALETTE.length]; return [
+    {label:`${k}평 실거래`, data:u.tr.filter(t=>key(t[3])===k && t[4]).map(t=>({x:new Date(t[4]).getTime(), y:t[1]/1e4})),
+     backgroundColor:c, borderColor:c, pointRadius:3.5},
+    {label:`${k}평 호가`, data:u.ar.filter(a=>key(a[1])===k).map(a=>({x:today, y:a[0]/1e4})),
+     backgroundColor:'transparent', borderColor:c, pointStyle:'triangle', pointRadius:6, borderWidth:1.5}]; })
+    .filter(d => d.data.length);
+  charts.push(new Chart(document.getElementById('cu'), {type:'scatter', data:{datasets:sets},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{boxWidth:10, color:css('--ink'), filter:i => !i.text.endsWith('호가')}},
+        tooltip:{callbacks:{label:c => `${c.dataset.label} ${new Date(c.raw.x).toISOString().slice(2,10).replace(/-/g,'.')} · ${c.raw.y.toFixed(2)}억`}}},
+      scales:{x:{type:'linear', ticks:{color:css('--sub'), maxTicksLimit:8, callback:v => { const d = new Date(v); return `${String(d.getFullYear()).slice(2)}.${String(d.getMonth()+1).padStart(2,'0')}`; }}},
+              y:{title:{display:true, text:'억', color:css('--sub')}, ticks:{color:css('--sub')}}}}}));
+}
+
+/* ---------- 전체 갱신 ---------- */
+function refreshMap(){ map.closePopup(); drawFacilities(); drawUnits(); focusDongs(); drawToggles(); if (dockId) markSelected(dockId); }
+/* ---------- 지도 위 표시 켜기·끄기 (역·학교·접근 등급) ---------- */
+let HIDE = store.get('hide', {});
+const TOGGLES = [
+  {group:'시설', items:[
+    {k:'station', label:'역', color:RAIL}, {k:'elementary', label:'초', color:SCHOOL.elementary.c},
+    {k:'middle', label:'중', color:SCHOOL.middle.c}, {k:'high', label:'고', color:SCHOOL.high.c, dark:true}]},
+  {group:'재건축', items:[
+    {k:'rz1', label:'1차', color:RZ_STYLE.rz1.c}, {k:'rz2', label:'2차', color:RZ_STYLE.rz2.c}, {k:'rzx', label:'탈락', color:RZ_STYLE.rzx.c}]},
+  {group:'단지', items:[
+    {k:'상', label:'우수', color:GRADE_COLORS['상']}, {k:'중', label:'보통', color:GRADE_COLORS['중']}, {k:'하', label:'미흡', color:GRADE_COLORS['하']}]}];
+delete HIDE.legend;                                     // 이전 버전에서 저장된 값 정리
+const FAC_LAYER = () => ({station:stLayer, elementary:elemLayer, middle:midLayer, high:highLayer});
+const toggleCtl = L.control({position:'topleft'});
+toggleCtl.onAdd = () => { const el = L.DomUtil.create('div', 'map-toggles');
+  L.DomEvent.disableClickPropagation(el); L.DomEvent.disableScrollPropagation(el); return el; };
+// 시설·단지 표시 버튼은 범례 안에 그림 (별도 상자 없음)
+function countOf(k){
+  if (k.startsWith('rz')) return D.units.filter(u => RZ_KEY(u) === k && u.lat!=null && (state.dong==='전체' || u.dong===state.dong) && shown(u)).length;
+  if (FAC_LAYER()[k]) return FAC_LAYER()[k].getLayers().length;
+  return D.units.filter(u => u.grade===k && u.lat!=null && (state.dong==='전체' || u.dong===state.dong) && shown(u)).length;
+}
+// 버튼 묶음 접기: 모바일은 접힘, PC 는 펼침으로 시작하고 이후엔 마지막 상태 기억
+let TG_OPEN = store.get('togglesOpen', !isMobile());
+function drawToggles(){
+  const el = document.querySelector('.leaflet-control.legend .lg-tg'); if (!el) return;
+  const hidden = TOGGLES.flatMap(g => g.items).filter(it => HIDE[it.k]).length;
+  const badge = document.querySelector('.leaflet-control.legend .lg-hidden');
+  if (badge) badge.innerHTML = hidden ? `<em>${hidden}개 숨김</em>` : '';
+  el.innerHTML = TOGGLES.map(g => `<div class="mt-group" role="group" aria-label="${g.group} 표시"><span class="mt-label">${g.group}</span>${
+    g.items.map(it => `<button class="mt-chip${HIDE[it.k]?' off':''}" data-tg="${it.k}" aria-pressed="${!HIDE[it.k]}"
+      style="--c:${it.color};--t:${it.dark?'#14532d':'#fff'}" title="${it.label} ${HIDE[it.k]?'보이기':'숨기기'}">${it.label}<small>${countOf(it.k)}</small></button>`).join('')}</div>`).join('');
+}
+function applyToggles(){
+  Object.entries(FAC_LAYER()).forEach(([k, layer]) => HIDE[k] ? map.removeLayer(layer) : map.addLayer(layer));
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.mt-chip'); if (!b) return;
+  const k = b.dataset.tg; HIDE[k] = !HIDE[k]; store.set('hide', HIDE);
+  applyToggles();
+  if (['상','중','하','rz1','rz2','rzx'].includes(k)) drawUnits();
+  drawToggles();
+});
+// 레이어 메뉴에서 켜고 꺼도 버튼 상태를 맞춤
+map.on('overlayadd overlayremove', e => {
+  const k = Object.entries(FAC_LAYER()).find(([, l]) => l === e.layer)?.[0];
+  if (k) { HIDE[k] = e.type === 'overlayremove'; store.set('hide', HIDE); drawToggles(); }
+});
+
+function recalc(){
+  buildFacilities(); computeUnits(); computeMetrics(); computeStats();
+  drawFacilities(); drawUnits(); focusDongs(); refreshLayerCtl(); applyToggles(); drawLegend(); drawToggles(); drawFacList(); render();
+  updateMfSum();
+}
+/* ---------- 모바일: 필터는 위에서 펼치고, 아래 시트에는 요약·단지 정보만 ---------- */
+const topFiltersEl = document.querySelector('.top-filters'), cfgEl = document.getElementById('cfg');
+function placeFilters(){
+  const slot = document.getElementById('mfSlot'), panel = document.getElementById('panel'), view = document.getElementById('view');
+  if (isMobile()) { if (topFiltersEl.parentNode !== slot) slot.append(topFiltersEl, cfgEl); }
+  else { if (topFiltersEl.parentNode !== panel) { panel.insertBefore(topFiltersEl, view); panel.insertBefore(cfgEl, view); } setMf(false); }
+}
+function setMf(open){
+  document.body.classList.toggle('mf-open', open);
+  document.getElementById('mfBtn').setAttribute('aria-expanded', open);
+}
+function updateMfSum(){
+  const el = document.getElementById('mfSum'); if (!el) return;
+  const price = `${FILTER.priceMin>0 ? FILTER.priceMin+'~' : ''}${FILTER.priceMax}억${FILTER.priceMin>0 ? '' : '↓'}`;
+  const hs = document.getElementById('mfHeadSum');
+  el.textContent = [state.dong==='전체' ? '5개 동' : state.dong, `${FILTER.areaMin}~${FILTER.areaMax}평`, price,
+    FILTER.rooms.length ? '방 ' + FILTER.rooms.map(r => r===4 ? '4+' : r).join('·') : '', SCOPE_NAME[state.scope]].filter(Boolean).join(' · ');
+  if (hs) hs.textContent = el.textContent;
+}
+document.getElementById('mfBtn').onclick = () => setMf(!document.body.classList.contains('mf-open'));
+document.getElementById('mfDim').onclick = () => setMf(false);
+document.getElementById('mfClose').onclick = () => setMf(false);
+document.getElementById('mfBack').onclick = () => setMf(false);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('mf-open')) setMf(false); });
+mq.addEventListener('change', placeFilters);
+const tabs = document.getElementById('tabs');
+['전체', ...D.dongs].forEach(n=>{ const b=document.createElement('button'); b.className='rchip'; b.textContent=n; b.dataset.dong=n;
+  b.onclick=()=>select(n); tabs.appendChild(b);
+  const q=document.createElement('button'); q.className='qchip'; q.textContent=n==='전체'?'5개 동':n; q.dataset.dong=n;
+  q.onclick=()=>select(n); document.getElementById('quickDong').appendChild(q); });
+const onlyBox = document.getElementById('onlyMatch');
+onlyBox.checked = state.only;
+onlyBox.onchange = () => { state.only = onlyBox.checked; store.set('onlyMatch', state.only); drawUnits(); render(); };
+const shown = u => !state.only || u.match || u.id === state.unit;
+document.querySelectorAll('[data-scope]').forEach(b=>b.onclick=()=>{ state.scope=b.dataset.scope; sync(); drawUnits(); drawLegend(); render(); });
+function sync(){
+  updateMfSum();
+  document.querySelectorAll('.qchip').forEach(b => b.setAttribute('aria-pressed', b.dataset.dong===state.dong));
+  tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.dong===state.dong));
+  document.querySelectorAll('[data-scope]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.scope===state.scope));
+}
+/* ---------- 거리 재기: 지도를 눌러 점을 찍으면 구간·누적 거리와 도보 예상 시간 ---------- */
+const MEAS = {on:false, pts:[], layer:L.layerGroup().addTo(map), ghost:L.layerGroup().addTo(map)};
+const WALK_M_PER_MIN = 4000 / 60, BIKE_M_PER_MIN = 15000 / 60;          // 도보 4km/h, 자전거 15km/h
+const fmtDist = m => m >= 1000 ? (m/1000).toFixed(2) + 'km' : m.toFixed(1) + 'm';
+const fmtMin = min => { min = Math.max(1, Math.round(min)); return min >= 60 ? `${Math.floor(min/60)}시간 ${min%60 ? min%60 + '분' : ''}` : `${min}분`; };
+const measTotal = pts => pts.reduce((a, p, i) => i ? a + map.distance(pts[i-1], p) : 0, 0);
+const MEAS_C = '#e5156b';
+const measCtl = L.control({position:'topright'});
+measCtl.onAdd = () => { const el = L.DomUtil.create('div', 'meas-ctl');
+  el.innerHTML = `<button class="meas-btn" id="measBtn" aria-pressed="false" title="거리 재기"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21Z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></svg><span>거리</span></button>`;
+  L.DomEvent.disableClickPropagation(el); return el; };
+measCtl.addTo(map);
+const measBox = L.DomUtil.create('div', 'meas-box', map.getContainer());
+L.DomEvent.disableClickPropagation(measBox); L.DomEvent.disableScrollPropagation(measBox);
+function measPanel(){
+  const n = MEAS.pts.length, tot = measTotal(MEAS.pts);
+  measBox.classList.toggle('show', MEAS.on || n > 0);
+  measBox.innerHTML = `<div class="mb-row">
+      <div class="mb-main">${n < 2 ? `<span class="mb-hint">${MEAS.on ? (n ? '다음 지점을 누르세요' : '시작 지점을 누르세요') : '거리 재기'}</span>`
+        : `<span class="mb-lbl">총거리</span><b>${fmtDist(tot)}</b>`}</div>
+      ${n >= 2 ? `<div class="mb-time"><span>도보 <b>${fmtMin(tot / WALK_M_PER_MIN)}</b></span><span>자전거 <b>${fmtMin(tot / BIKE_M_PER_MIN)}</b></span></div>` : ''}</div>
+    <div class="mb-acts">
+      <button data-mact="undo" ${n ? '' : 'disabled'}>되돌리기</button>
+      <button data-mact="clear" ${n ? '' : 'disabled'}>지우기</button>
+      <button data-mact="${MEAS.on ? 'done' : 'close'}" class="mb-primary">${MEAS.on ? '완료' : '닫기'}</button></div>
+    <div class="mb-note">직선 거리 기준 · ${MEAS.on ? '두 번 누르거나 Esc 로 완료' : '거리 버튼으로 다시 재기'}</div>`;
+}
+function measDraw(){
+  MEAS.layer.clearLayers();
+  const pts = MEAS.pts;
+  if (pts.length > 1) {
+    L.polyline(pts, {pane:'meas', color:'#fff', weight:7, opacity:.9, interactive:false}).addTo(MEAS.layer);
+    L.polyline(pts, {pane:'meas', color:MEAS_C, weight:3.5, opacity:1, interactive:false}).addTo(MEAS.layer);
+  }
+  let acc = 0;
+  pts.forEach((p, i) => {
+    if (i) acc += map.distance(pts[i-1], p);
+    const last = i === pts.length - 1;
+    L.circleMarker(p, {pane:'meas', radius:last ? 6.5 : 5, color:MEAS_C, weight:3, fillColor:'#fff', fillOpacity:1, interactive:false})
+      .bindTooltip(i ? `<b>${fmtDist(acc)}</b>${last && pts.length > 2 ? `<small>+${fmtDist(map.distance(pts[i-1], p))}</small>` : ''}` : '시작',
+        {permanent:true, direction:'right', offset:[8,0], className:'meas-tip' + (last && i ? ' last' : '')}).addTo(MEAS.layer);
+  });
+  measPanel();
+}
+function setMeas(on){
+  MEAS.on = on;
+  if (on && typeof adding !== 'undefined' && adding) document.getElementById('addMode').click();    // 시설 추가 모드와 겹치지 않게
+  map.getContainer().classList.toggle('measuring', on);
+  on ? map.doubleClickZoom.disable() : map.doubleClickZoom.enable();
+  document.getElementById('measBtn').setAttribute('aria-pressed', on);
+  document.getElementById('fabMeas').setAttribute('aria-pressed', on);
+  if (on) { map.closePopup(); if (isMobile() && sheetState !== 'peek') setSheet('peek'); }
+  MEAS.ghost.clearLayers(); measDraw();
+}
+const measToggle = () => { if (MEAS.on) setMeas(false); else { if (MEAS.pts.length && !MEAS.on) MEAS.pts = []; setMeas(true); } };
+document.getElementById('measBtn').onclick = measToggle;
+document.getElementById('fabMeas').onclick = measToggle;
+map.on('click', e => {
+  if (!MEAS.on) return;
+  const last = MEAS.pts[MEAS.pts.length - 1];
+  if (last && map.distance(last, e.latlng) < 1) return;                  // 두 번 누를 때 같은 자리 중복 방지
+  MEAS.pts.push(e.latlng); MEAS.ghost.clearLayers(); measDraw();
+});
+map.on('dblclick', e => {               // 같은 자리를 두 번 눌렀을 때만 완료 (빠르게 다른 곳을 연달아 찍는 경우는 제외)
+  if (!MEAS.on || !MEAS.pts.length) return;
+  const last = MEAS.pts[MEAS.pts.length - 1];
+  if (map.latLngToContainerPoint(last).distanceTo(e.containerPoint) < 12) setMeas(false);
+});
+map.on('mousemove', e => {               // PC: 마지막 점에서 마우스까지 미리보기
+  if (!MEAS.on || !MEAS.pts.length || isMobile()) return;
+  const last = MEAS.pts[MEAS.pts.length - 1];
+  MEAS.ghost.clearLayers();
+  L.polyline([last, e.latlng], {pane:'meas', color:MEAS_C, weight:2.5, dashArray:'6 6', opacity:.8, interactive:false}).addTo(MEAS.ghost);
+  const t = measTotal(MEAS.pts) + map.distance(last, e.latlng);
+  L.tooltip({permanent:true, direction:'right', offset:[12,0], className:'meas-tip ghost'}).setLatLng(e.latlng)
+    .setContent(`${fmtDist(t)} · 도보 ${fmtMin(t / WALK_M_PER_MIN)}`).addTo(MEAS.ghost);
+});
+map.getContainer().addEventListener('mouseleave', () => MEAS.ghost.clearLayers());
+measBox.addEventListener('click', e => {
+  const b = e.target.closest('[data-mact]'); if (!b) return;
+  const a = b.dataset.mact;
+  if (a === 'undo') { MEAS.pts.pop(); MEAS.ghost.clearLayers(); measDraw(); }
+  else if (a === 'clear') { MEAS.pts = []; MEAS.ghost.clearLayers(); measDraw(); }
+  else if (a === 'done') setMeas(false);
+  else if (a === 'close') { MEAS.pts = []; setMeas(false); }
+});
+document.addEventListener('keydown', e => {
+  if (!MEAS.on || /input|textarea|select/i.test(e.target.tagName)) return;
+  if (e.key === 'Escape') setMeas(false);
+  else if (e.key === 'Backspace' || (e.key === 'z' && (e.ctrlKey || e.metaKey))) { e.preventDefault(); MEAS.pts.pop(); measDraw(); }
+});
+
+/* ---------- PC: 지도·정보 영역 크기 조절 ---------- */
+(() => {
+  const sp = document.getElementById('splitter'), wrap = document.querySelector('.wrap'), tip = sp.querySelector('.sp-tip');
+  const MIN_MAP = 320, MIN_PANEL = 380, DEF = 49;
+  let raf = 0;
+  const apply = pct => {
+    const W = wrap.clientWidth || 1;
+    const lo = MIN_MAP / W * 100, hi = 100 - (MIN_PANEL + 9) / W * 100;
+    pct = Math.min(Math.max(pct, lo), Math.max(lo, hi));
+    document.documentElement.style.setProperty('--mapw', pct.toFixed(2) + '%');
+    sp.setAttribute('aria-valuenow', Math.round(pct));
+    tip.textContent = `지도 ${Math.round(pct)}% · 정보 ${100 - Math.round(pct)}%`;
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(() => map.invalidateSize({pan:false}));
+    return pct;
+  };
+  apply(store.get('mapw', DEF));
+  let x0 = 0, p0 = DEF;
+  sp.addEventListener('pointerdown', e => {
+    if (isMobile()) return;
+    x0 = e.clientX; p0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mapw')) || DEF;
+    sp.setPointerCapture(e.pointerId); sp.classList.add('drag'); document.body.classList.add('resizing');
+  });
+  sp.addEventListener('pointermove', e => {
+    if (!sp.classList.contains('drag')) return;
+    apply(p0 + (e.clientX - x0) / wrap.clientWidth * 100);
+  });
+  const end = () => { if (!sp.classList.contains('drag')) return;
+    sp.classList.remove('drag'); document.body.classList.remove('resizing');
+    store.set('mapw', parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mapw')));
+    map.invalidateSize(); };
+  sp.addEventListener('pointerup', end); sp.addEventListener('pointercancel', end);
+  sp.addEventListener('dblclick', () => { store.set('mapw', apply(DEF)); toast('기본 크기로 되돌렸습니다.'); });
+  sp.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mapw')) || DEF;
+    store.set('mapw', apply(cur + (e.key === 'ArrowRight' ? 2 : -2)));
+  });
+  window.addEventListener('resize', () => apply(store.get('mapw', DEF)));
+})();
+
+/* ---------- 모바일 둥근 버튼 ---------- */
+document.getElementById('fabLayers').onclick = e => { e.stopPropagation();
+  const c = layerCtl.getContainer(); c.classList.contains('leaflet-control-layers-expanded') ? layerCtl.collapse() : layerCtl.expand(); };
+document.getElementById('fabLegend').onclick = () => {
+  const lg = document.querySelector('.leaflet-control.legend'), on = !lg.classList.contains('m-show');
+  lg.classList.toggle('m-show', on); document.getElementById('fabLegend').setAttribute('aria-pressed', on);
+  if (on) { lg.classList.remove('collapsed'); }
+};
+document.getElementById('fabDim').onclick = () => { const on = map.getContainer().classList.toggle('dim');
+  document.getElementById('fabDim').setAttribute('aria-pressed', on); document.querySelectorAll('.dim-btn').forEach(b => b.textContent = on ? '배경 흐림 켜짐' : '배경 원래대로'); };
+document.getElementById('fabFit').onclick = () => {
+  const t = state.dong==='전체' ? allBounds : dongLayers[state.dong] && dongLayers[state.dong].getBounds();
+  if (t && t.isValid()) (isMobile() ? fitVisible(t.pad(.02)) : map.flyToBounds(t.pad(.04), {duration:.6}));
+};
+map.on('click', () => { layerCtl.collapse(); if (isMobile()) { const lg = document.querySelector('.leaflet-control.legend'); lg && lg.classList.remove('m-show'); } });
+
+/* ---------- 단지 공유 링크 (#unit=ID) ---------- */
+function unitLink(id){ return location.origin + location.pathname + '#unit=' + encodeURIComponent(id); }
+function selectUnit(id, fly=true){
+  try { history.replaceState(null, '', '#unit=' + encodeURIComponent(id)); } catch {}
+  const u = D.units.find(x => x.id===id); if (!u) return;
+  const changed = state.dong !== u.dong;
+  state.unit = id; state.dong = u.dong; sync(); if (changed) refreshMap(); render();
+  document.querySelector('.panel').scrollTop = 0;
+  const mk = markers[id];
+  if (mk) {
+    if (isMobile()) { if (sheetState==='peek') setSheet('half'); flyVisible(mk.getLatLng(), Math.max(map.getZoom(), 16)); return; }
+    if (fly) { map.flyTo(mk.getLatLng(), Math.max(map.getZoom(), 16), {duration:.5}); setTimeout(() => showDock(D.units.find(x => x.id === id)), 550); }
+    else showDock(D.units.find(x => x.id === id)); }
+}
+function select(n){
+  if (isMobile()) setMf(false);
+  hideDock();
+  try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch {}
+  state.unit = null;
+  state.dong = n; sync(); refreshMap(); render(); map.invalidateSize();
+  const target = n==='전체' ? allBounds : dongLayers[n] && dongLayers[n].getBounds();
+  if (isMobile() && sheetState==='full') setSheet('half');
+  if (target && target.isValid()) (isMobile() ? fitVisible(target.pad(.02)) : map.flyToBounds(target.pad(.04), {duration:.6}));
+}
+buildCfgForm(); placeFilters(); recalc();
+window.addEventListener('load', () => { const m = location.hash.match(/^#unit=(.+)$/); if (m) setTimeout(() => selectUnit(decodeURIComponent(m[1]), true), 400); });
+mq.addEventListener('change', () => { recalc(); setSheet(sheetState); setTimeout(() => map.invalidateSize(), 50); });
+const fitAll = () => { map.invalidateSize(); setSheet(sheetState);
+  if (!allBounds.isValid()) return map.setView([37.37,127.12],13);
+  map.fitBounds(allBounds.pad(.02), isMobile() ? {paddingBottomRight:[0, sheetPx()]} : {}); };
+fitAll(); zoomClass(); sync();
+window.addEventListener('load', fitAll);                       // 글꼴·레이아웃이 확정된 뒤 지도 크기 다시 맞춤
+window.addEventListener('resize', () => map.invalidateSize());
+
+/* ---------- 챗봇 연동: 지금 화면 상태를 챗봇에 넘김 (chat-api 가 없으면 아무 일도 안 함) ---------- */
+window.briefingContext = () => {
+  const u = state.unit ? D.units.find(x => x.id === state.unit) : null;
+  const lead = document.querySelector('#view .lead');
+  return {
+    date: D.date, dong: state.dong, scope: state.scope, unit: u ? u.name : null,
+    filter: {areaMin: FILTER.areaMin, areaMax: FILTER.areaMax, priceMin: FILTER.priceMin, priceMax: FILTER.priceMax, rooms: [...FILTER.rooms],
+             hhMin: FILTER.hhMin, hhMax: FILTER.hhMax, ageMin: FILTER.ageMin},
+    cfg: {walk: CFG.walk, weight: CFG.weight, cuts: CFG.cuts, fullRatio: CFG.fullRatio, zeroRatio: CFG.zeroRatio, custom: CUSTOM},
+    summary: lead ? lead.innerText.replace(/\s+/g, ' ').trim() : null,
+  };
+};
+if (location.protocol.startsWith('http')) {
+  const s = document.createElement('script');
+  s.src = '/chat-api/widget.js';
+  s.onload = () => window.DashboardChat && DashboardChat.mount({endpoint: '/chat-api/api/chat', getContext: window.briefingContext});
+  s.onerror = () => {};                                          // 챗봇을 안 띄운 서버에서는 조용히 무시
+  document.body.appendChild(s);
+}
+</script>
+</body>
+</html>

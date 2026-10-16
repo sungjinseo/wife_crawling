@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+data/
+cache/
+*.html
+!briefing_template.html
+.env
