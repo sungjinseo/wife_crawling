@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "APK 빌드",
+      "type": "shell",
+      "command": "cp ../tools/collect_naver.py app/src/main/python/collect_naver.py && ./gradlew assembleRelease && ls -la app/build/outputs/apk/release/",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "휴대폰에 설치 (adb)",
+      "type": "shell",
+      "command": "adb install -r app/build/outputs/apk/release/app-release.apk",
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "APK 빌드",
+      "problemMatcher": []
+    },
+    {
+      "label": "휴대폰 로그 보기 (수집기 출력)",
+      "type": "shell",
+      "command": "adb logcat -c && adb logcat -s python.stdout:I python.stderr:W AndroidRuntime:E chromium:I",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "빌드 정리",
+      "type": "shell",
+      "command": "./gradlew clean",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}

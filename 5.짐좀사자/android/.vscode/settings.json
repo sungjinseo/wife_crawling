@@ -1,0 +1,5 @@
+{
+  "files.exclude": { "**/build": true, "**/.gradle": true },
+  "kotlin.languageServer.enabled": true,
+  "java.import.gradle.enabled": false
+}
