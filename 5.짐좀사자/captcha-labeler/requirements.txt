@@ -1,0 +1,9 @@
+tensorflow-cpu==2.15.1
+CaptchaCracker==0.0.7
+gradio==4.44.1
+pillow==10.4.0
+requests==2.32.3
+numpy==1.26.4
+huggingface_hub==0.25.2
+pydantic==2.10.6
+fastapi==0.115.6
