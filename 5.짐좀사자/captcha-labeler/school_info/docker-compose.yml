@@ -1,0 +1,11 @@
+services:
+  schoolinfo:
+    build: .
+    container_name: schoolinfo-collector
+    ports:
+      - "7860:7860"
+    environment:
+      - NEIS_KEY=ffc5873c6f1849c498f6299debe0a582      # 선택: NEIS Open API 키
+    volumes:
+      - ./outputs:/app/outputs       # 수집된 JSON이 호스트에도 남음
+    restart: unless-stopped
